@@ -1,12 +1,13 @@
 # -*- Makefile -*-
 
-# build the final executable, taken from https://stackoverflow.com/questions/40621451/makefile-automatically-compile-all-c-files-keeping-o-files-in-separate-folde
+# builds the final executable, taken from https://stackoverflow.com/questions/40621451/makefile-automatically-compile-all-c-files-keeping-o-files-in-separate-folde
 
 # ty baltaboss <3
 
-# source folder and object files folder
+# source folder, object files folder and executable folder
 SRC := src
 OBJ := build
+BIN := bin
 
 # compiler
 CC := g++
@@ -16,13 +17,13 @@ SOURCES := $(wildcard $(SRC)/*.cpp)
 OBJECTS := $(patsubst $(SRC)/%.cpp, $(OBJ)/%.o, $(SOURCES))
 
 # compiles every object into the final 'robo-maze' executable
-# $^ = the name of all dependencies
+# $^ = the name of all dependencies of this recipe
 all: $(OBJECTS)
-	$(CC) $^ -o ./bin/robo-maze
+	$(CC) $^ -o $(BIN)/robo-maze
 
 # compiles every source file into its respective object file
 # $@ = name of rule/recipe target
-# $< = name of first dependency
+# $< = name of first dependency of this recipe
 $(OBJ)/%.o: $(SRC)/%.cpp
 	$(CC) -c $< -o $@
 
