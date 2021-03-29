@@ -15,7 +15,7 @@
 #include <string> // for string manipulation
 
 //PROJECT includes
-#include "utils.h"
+#include "../include/utils.h"
 
 /**
  * @brief This is the entrypoint for the porgram itself, required by the compiler.
