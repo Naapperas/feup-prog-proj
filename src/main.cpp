@@ -22,7 +22,7 @@
  * 
  * @return int the exit code, default to 0;
  */
-int main(){
+int main() {
 
     clearScreen();
 
