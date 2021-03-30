@@ -34,14 +34,18 @@ GameMenuOption showMenu(std::ostream& out, std::istream& in) {
     
     int response;
 
-    out << "Robot Maze" << '\n' << "Menu:" << '\n' << "1) Rules" << '\n' << "2) Play" << '\n' << "0) Exit" << '\n' << "Option: ";
+    out << "Robot Maze" << '\n' << "Menu:" << '\n' << "1) Rules" << '\n' << "2) Play" << '\n' << "0) Exit";
     
     do {
+        out << '\n' << "Option: ";
         in >> response;
 
         // Sanitize response, i.e., if response is not one of the options, inform the player.
 
-    } while (response != 0 || response != 1 || response != 2); 
+        if (response != 0 && response != 1 && response != 2)
+            out << "Invalid option, please input a valid option out f the list.";
+
+    } while (response != 0 && response != 1 && response != 2); 
 
     return static_cast<GameMenuOption>(response);
 
