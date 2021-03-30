@@ -16,6 +16,7 @@
 
 //PROJECT includes
 #include "../include/utils.h"
+#include "../include/game.h"
 
 /**
  * @brief Shows the rules of the game.
@@ -54,7 +55,7 @@ bool showMenu(std::ostream& out, std::istream& in) {
 
     } while (response != 0 && response != 2); 
 
-    return response == 2;
+    return response == 2; // true if response is 2 i.e. the user wants to play the game
 }
 
 /**
@@ -69,6 +70,7 @@ int main() {
     if (showMenu(std::cout, std::cin)) { // we are to play the game, play it
         clearScreen();
         std::cout << "adhj,yt" << std::endl;
+        Game::play(std::cout);
     }
 
     return 0;
