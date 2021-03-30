@@ -18,19 +18,11 @@
 #include "../include/utils.h"
 
 /**
- * @brief Enum holding constants representing the menu options.
- * 
- */
-enum GameMenuOption {
-    EXIT, RULES, PLAY
-};
-
-/**
  * @brief Shows the game's menu.
  * 
  * @param out the stream to write the menu to.
  */
-GameMenuOption showMenu(std::ostream& out, std::istream& in) {
+bool showMenu(std::ostream& out, std::istream& in) {
     
     int response;
 
@@ -47,7 +39,15 @@ GameMenuOption showMenu(std::ostream& out, std::istream& in) {
 
     } while (response != 0 && response != 1 && response != 2); 
 
-    return static_cast<GameMenuOption>(response);
+    return true;
+
+}
+
+/**
+ * @brief Shows the rules of the game
+ * 
+ */
+void showRules() {
 
 }
 
@@ -60,19 +60,8 @@ int main() {
 
     clearScreen();
 
-    switch (showMenu(std::cout, std::cin)) {
+    if (showMenu(std::cout, std::cin)) {
         
-        case EXIT:
-            break;
-
-        case RULES:
-            break;
-
-        case PLAY:
-            break;
-        
-        default:
-            break;
     }
 
     return 0;
