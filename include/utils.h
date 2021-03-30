@@ -19,6 +19,6 @@
  * @brief Clears the screen so the console appears non-dirty.
  * 
  */
-inline void clearScreen() {
+void clearScreen() {
     std::cout << std::string( 100, '\n' ) << std::endl;
 }

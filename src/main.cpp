@@ -18,7 +18,37 @@
 #include "../include/utils.h"
 
 /**
- * @brief This is the entrypoint for the porgram itself, required by the compiler.
+ * @brief Enum holding constants representing the menu options.
+ * 
+ */
+enum GameMenuOption {
+    EXIT, RULES, PLAY
+};
+
+/**
+ * @brief Shows the game's menu.
+ * 
+ * @param out the stream to write the menu to.
+ */
+GameMenuOption showMenu(std::ostream& out, std::istream& in) {
+    
+    int response;
+
+    out << "Robot Maze" << '\n' << "Menu:" << '\n' << "1) Rules" << '\n' << "2) Play" << '\n' << "0) Exit" << '\n' << "Option: ";
+    
+    do {
+        in >> response;
+
+        // Sanitize response, i.e., if response is not one of the options, inform the player.
+
+    } while (response != 0 || response != 1 || response != 2); 
+
+    return static_cast<GameMenuOption>(response);
+
+}
+
+/**
+ * @brief This is the entrypoint for the program itself, required by the compiler.
  * 
  * @return int the exit code, default to 0;
  */
@@ -26,16 +56,20 @@ int main() {
 
     clearScreen();
 
-    std::cout << "********************************" << std::endl;
+    switch (showMenu(std::cout, std::cin)) {
+        
+        case EXIT:
+            break;
 
-    char c;
-    std::cin >> c;
+        case RULES:
+            break;
 
-    clearScreen();
-
-    std::cout << "********************************" << std::endl;
-
-    std::cin >> c;
+        case PLAY:
+            break;
+        
+        default:
+            break;
+    }
 
     return 0;
 }

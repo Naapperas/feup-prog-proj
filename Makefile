@@ -5,9 +5,9 @@
 # ty baltaboss <3
 
 # source folder, object files folder and executable folder
-SRC := src
-OBJ := build
-BIN := bin
+SRC := ./src
+OBJ := ./build
+BIN := ./bin
 
 # compiler
 CC := g++
@@ -29,8 +29,8 @@ $(OBJ)/%.o: $(SRC)/%.cpp
 
 # clean the build folder
 clean:
-	rm -rf ./build/*.o
+	rm -rf $(OBJ)/*.o
 
 # keeps the source files only
 uninstall: clean
-	rm ./bin/robo-maze
+	rm $(BIN)/robo-maze
