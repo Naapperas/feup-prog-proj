@@ -69,7 +69,6 @@ int main() {
 
     if (showMenu(std::cout, std::cin)) { // we are to play the game, play it
         clearScreen();
-        std::cout << "adhj,yt" << std::endl;
         Game::play(std::cout);
     }
 
