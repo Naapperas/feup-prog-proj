@@ -13,6 +13,7 @@
 #pragma once
 
 #include <iostream>
+#include <vector>
 
 // we partition definitions in namespaces in order to group relevant/similar code together.
 
@@ -34,9 +35,15 @@ namespace Game {
          */
         struct _BaseEntity {
 
+            void die() { this->alive = false; }
+            bool isAlive() const { return this->alive; }
+
             protected: // declare these properties 'protected' so children structs have acces to them.
-                bool alive; // straightforward, are we alive or not.
+                bool alive = true; // straightforward, are we alive or not.
                 char aliveSymbol, deadSymbl; // how we are represented in the game.
+
+            private:
+
 
         };
 
@@ -92,9 +99,16 @@ namespace Game {
 
         }
 
+        /**
+         * @brief Prints the board to the screen.
+         * 
+         */
+        void showBoard(std::ostream& out);
+
         private:
             char fenceOrPostSymbol = '*';
             int cols, rows;
+            std::vector<std::vector<char>> board;
 
     };
 

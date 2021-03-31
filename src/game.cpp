@@ -17,3 +17,7 @@ void Game::play(std::ostream& out) {
     out << "I'm in" << '\n';
 
 }
+
+void Game::Board::showBoard(std::ostream& out) {
+    
+}
