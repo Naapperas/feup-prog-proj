@@ -14,6 +14,7 @@
 
 #include <iostream>
 #include <string>
+#include <vector>
 
 /**
  * @brief Clears the screen so the console appears non-dirty.
@@ -21,4 +22,24 @@
  */
 void clearScreen() {
     std::cout << std::string( 100, '\n' ) << std::endl;
+}
+
+/**
+ * @brief Reads a file given by the specified filename and returns a vector containing every line in the file.
+ * 
+ * @param filename the name of the file to read.
+ * @return std::vector<std::string> 
+ */
+std::vector<std::string> readFileLines(std::string filename) {
+
+}
+
+/**
+ * @brief Checks whether the specified file exists or not.
+ * 
+ * @param filename the name of the file to check.
+ * @return true if the file exists, false otherwise.
+ */
+bool fileExists(std::string filename) {
+
 }
