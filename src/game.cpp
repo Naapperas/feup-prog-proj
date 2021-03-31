@@ -18,6 +18,11 @@ void Game::play(std::ostream& out) {
 
 }
 
+/**
+ * @brief 
+ * 
+ * @param out 
+ */
 void Game::Board::showBoard(std::ostream& out) {
     
 }

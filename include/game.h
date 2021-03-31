@@ -18,68 +18,60 @@
 // we partition definitions in namespaces in order to group relevant/similar code together.
 
 /**
- * @brief namespace for bundling together all mechanich related functions.
+ * @brief namespace for bundling together all mechanics-related functions.
  * 
  */
 namespace Game {
 
     /**
-     * @brief Entity related namespace, where all the entity definitions are.
+     * @brief The Base entity struct that serves as a foundation to every other entity.
      * 
      */
-    namespace Entity {
+    struct _BaseEntity {
+
+        void die() { this->alive = false; }
+        bool isAlive() const { return this->alive; }
+
+        protected: // declare these properties 'protected' so children structs have access to them.
+            bool alive = true; // straightforward, are we alive or not.
+            char aliveSymbol, deadSymbl; // how we are represented in the game.
+
+        private:
+
+
+    };
+
+    /**
+     * @brief The 'Robot' entity.
+     * 
+     */
+    struct Robot : _BaseEntity {
 
         /**
-         * @brief The Base entity struct that serves as a foundation to every other entity.
-         * 
-         */
-        struct _BaseEntity {
+         * @brief Construct a new Robot object
+            * 
+            */
+        Robot() {
+            this->aliveSymbol = 'R';
+            this->deadSymbl = 'r';
+        }
 
-            void die() { this->alive = false; }
-            bool isAlive() const { return this->alive; }
+    };
 
-            protected: // declare these properties 'protected' so children structs have acces to them.
-                bool alive = true; // straightforward, are we alive or not.
-                char aliveSymbol, deadSymbl; // how we are represented in the game.
-
-            private:
-
-
-        };
-
-        /**
-         * @brief The 'Robot' entity.
-         * 
-         */
-        struct Robot : _BaseEntity {
-
-            /**
-             * @brief Construct a new Robot object
-             * 
-             */
-            Robot() {
-                this->aliveSymbol = 'R';
-                this->deadSymbl = 'r';
-            }
-
-        };
+    /**
+     * @brief The 'Player' entity.
+     * 
+     */
+    struct Player : _BaseEntity {
 
         /**
-         * @brief The 'Player' entity.
-         * 
-         */
-        struct Player : _BaseEntity {
-
-            /**
-             * @brief Construct a new Player object
-             * 
-             */
-            Player() {
-                this->aliveSymbol = 'H';
-                this->deadSymbl = 'h';
-            }
-
-        };
+         * @brief Construct a new Player object
+            * 
+            */
+        Player() {
+            this->aliveSymbol = 'H';
+            this->deadSymbl = 'h';
+        }
 
     };
 

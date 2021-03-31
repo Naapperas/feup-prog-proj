@@ -19,6 +19,14 @@
 #include "../include/game.h"
 
 /**
+ * @brief Options avalaible when in the menu.
+ * 
+ */
+enum GameMenuOption {
+    EXIT, RULES, PLAY
+};
+
+/**
  * @brief Shows the rules of the game.
  * 
  * @param out the stream to write the rules to
@@ -42,20 +50,27 @@ bool showMenu(std::ostream& out, std::istream& in) {
 
     out << "Robot Maze" << '\n' ;
     
-    do {
+    while (true) {
         out << "Menu:" << '\n' << "1) Rules" << '\n' << "2) Play" << '\n' << "0) Exit" << '\n' << "Option: ";
         in >> response;
 
         // Sanitize response, i.e., if response is not one of the options, inform the player.
 
-        if (response == 1)
-            showRules(out);
-        else if (response != 0 && response != 2)
-            out << "Invalid option, please input a valid option out of the list.";
+        switch (response) {
+            case RULES:
+                showRules(out);
+                break;
+            
+            case PLAY:
+                return true;
 
-    } while (response != 0 && response != 2); 
-
-    return response == 2; // true if response is 2 i.e. the user wants to play the game
+            case EXIT:
+                return false;
+            
+            default:
+                out << "Invalid option, please input a valid option out of the list.";
+        };
+    }
 }
 
 /**
@@ -71,6 +86,8 @@ int main() {
         clearScreen();
         Game::play(std::cout);
     }
+
+    std::cout << fileExists("test.txt") << std::endl;
 
     return 0;
 }

@@ -13,6 +13,7 @@
 #pragma once
 
 #include <iostream>
+#include <fstream>
 #include <string>
 #include <vector>
 
@@ -20,7 +21,7 @@
  * @brief Clears the screen so the console appears non-dirty.
  * 
  */
-void clearScreen() {
+inline void clearScreen() {
     std::cout << std::string( 100, '\n' ) << std::endl;
 }
 
@@ -28,18 +29,23 @@ void clearScreen() {
  * @brief Reads a file given by the specified filename and returns a vector containing every line in the file.
  * 
  * @param filename the name of the file to read.
- * @return std::vector<std::string> 
+ * @return std::vector<std::string> a vector with the lines of the file, or an empty vector if the file does not exist/an error occurs
  */
 std::vector<std::string> readFileLines(std::string filename) {
 
-}
+    std::vector<std::string> fileLines;
 
-/**
- * @brief Checks whether the specified file exists or not.
- * 
- * @param filename the name of the file to check.
- * @return true if the file exists, false otherwise.
- */
-bool fileExists(std::string filename) {
+    std::string fullPath = "../resources/" + filename;
 
+    std::ifstream f;
+
+    f.open(fullPath);
+
+    if(f.is_open()) {
+
+        // file exists, read lines
+
+    }
+
+    return fileLines;
 }
