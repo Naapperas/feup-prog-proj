@@ -10,19 +10,43 @@
  * 
  */
 
+#define GO_BACK false
+
 #include "../include/game.h"
+#include "../include/utils.h"
 
-void Game::play(std::ostream& out) {
+bool Game::play(std::ostream& out, std::istream& in) {
 
-    out << "I'm in" << '\n';
+    int option;
+    std::vector<std::string> mapLines;
 
-}
+    while (true) {
 
-/**
- * @brief 
- * 
- * @param out 
- */
-void Game::Board::showBoard(std::ostream& out) {
-    
+        out << "What is the maze that you want to play (1 through 99, or 0 to go back to the previous menu): ";
+        in >> option;
+
+        if(!option) return GO_BACK; // we want to go back to the previous menu
+
+        std::string mapFileName; 
+        mapFileName.append("MAZE_");
+        mapFileName.append(((option < 10) ? "0" : ""));
+        mapFileName.append(std::to_string(option));
+        mapFileName.append(".txt");
+
+        out << mapFileName << std::endl;
+
+        mapLines = readFileLines(mapFileName);
+
+        in.ignore(10000, '\n');
+
+        if (!mapLines.empty()) // the file does exist, break out of input loop and play the game
+            break;
+        
+        out << "The specified map does not exist, please choose another one." << std::endl;
+    }
+
+    clearScreen();
+
+    return true;
+
 }

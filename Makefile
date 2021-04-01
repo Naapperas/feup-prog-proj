@@ -33,4 +33,4 @@ clean:
 
 # keeps the source files only
 uninstall: clean
-	rm $(BIN)/robo-maze
+	rm -f $(BIN)/robo-maze

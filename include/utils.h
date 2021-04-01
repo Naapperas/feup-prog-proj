@@ -17,6 +17,9 @@
 #include <string>
 #include <vector>
 
+// the relative path of the resources
+#define PATH "./resources/"
+
 /**
  * @brief Clears the screen so the console appears non-dirty.
  * 
@@ -31,20 +34,24 @@ inline void clearScreen() {
  * @param filename the name of the file to read.
  * @return std::vector<std::string> a vector with the lines of the file, or an empty vector if the file does not exist/an error occurs
  */
-std::vector<std::string> readFileLines(std::string filename) {
+inline std::vector<std::string> readFileLines(std::string filename) {
+
+    //TODO: remove inline declaration, as it might not be performant
 
     std::vector<std::string> fileLines;
 
-    std::string fullPath = "../resources/" + filename;
+    std::fstream f;
 
-    std::ifstream f;
+    f.open(PATH + filename, std::ios::in);
 
-    f.open(fullPath);
-
-    if(f.is_open()) {
+    if (f.is_open()) {
 
         // file exists, read lines
 
+        std::string line;
+
+        while (std::getline(f, line))   
+            fileLines.push_back(line);      
     }
 
     return fileLines;

@@ -13,6 +13,7 @@
 //STL includes
 #include <iostream> // for access to in/out streams 
 #include <string> // for string manipulation
+#include <vector> // for operations with vectors
 
 //PROJECT includes
 #include "../include/utils.h"
@@ -36,7 +37,6 @@ inline void showRules(std::ostream& out) {
     
     clearScreen();
     std::cout << "This is a robot maze game.\nYour goal is to escape all of the robots that exist in the labirinth.\nBut beaware: the fences and posts are electric, and you will get electrocuted if you touch them. So, you know... don't.\nEach time you make a move, the robots also move, and they will always move towards you in the direction of the shortest path.\nUse the:\n-AWDX keys to move vertically and horizontally.\n-QECZ keys to move diagonally.\n-S key to stay in place.\n\nIf you get captured by one of the robots or touch the fences/posts, you lose. If not, you win.\nRobots that collide with each other get destroyed/stuck, obstructing a cell that you can't move into.\nThat said, good luck.\n" << std::endl;
-
 }
 
 /**
@@ -82,12 +82,13 @@ int main() {
 
     clearScreen();
 
-    if (showMenu(std::cout, std::cin)) { // we are to play the game, play it
-        clearScreen();
-        Game::play(std::cout);
+    while (true) {
+        if (showMenu(std::cout, std::cin)) { // we are to play the game, play it
+            clearScreen();
+            if (Game::play(std::cout, std::cin)) // this function did not return 0 i.e. the game was played.
+                break;
+        } else break;
     }
-
-    std::cout << fileExists("test.txt") << std::endl;
 
     return 0;
 }

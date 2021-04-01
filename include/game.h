@@ -29,9 +29,6 @@ namespace Game {
      */
     struct _BaseEntity {
 
-        void die() { this->alive = false; }
-        bool isAlive() const { return this->alive; }
-
         protected: // declare these properties 'protected' so children structs have access to them.
             bool alive = true; // straightforward, are we alive or not.
             char aliveSymbol, deadSymbl; // how we are represented in the game.
@@ -49,12 +46,21 @@ namespace Game {
 
         /**
          * @brief Construct a new Robot object
-            * 
-            */
+         * 
+         */
         Robot() {
             this->aliveSymbol = 'R';
             this->deadSymbl = 'r';
+            this->robotID = generateRobotID();
         }
+
+        private:
+            int generateRobotID() {
+                static int id = 1;
+                return id++;
+            }
+
+            int robotID;
 
     };
 
@@ -66,8 +72,8 @@ namespace Game {
 
         /**
          * @brief Construct a new Player object
-            * 
-            */
+         * 
+         */
         Player() {
             this->aliveSymbol = 'H';
             this->deadSymbl = 'h';
@@ -91,12 +97,6 @@ namespace Game {
 
         }
 
-        /**
-         * @brief Prints the board to the screen.
-         * 
-         */
-        void showBoard(std::ostream& out);
-
         private:
             char fenceOrPostSymbol = '*';
             int cols, rows;
@@ -105,9 +105,14 @@ namespace Game {
     };
 
     /**
-     * @brief Starts to play the game.
+     * @brief Starts to play the game. At this point, the user is asked to choose a number between 1 and 99 to play the respective maze, or 0 to return to the initial menu. 
      * 
+     * @param out the output stream to write to
+     * @param in the input stream to read input from
+     * @return true if a map was chosen, false otherwise
      */
-    void play(std::ostream& out);
+    bool play(std::ostream& out, std::istream& in);
+
+
 
 }
