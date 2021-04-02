@@ -16,11 +16,11 @@
 #include <vector>
 #include <fstream>
 
+//PROJECT includes
+#include "../include/main.h"
+
 // the relative path of the resources
 #define PATH "./resources/"
-
-//PROJECT includes
-//#include "../include/main.h"
 
 /**
  * @brief Options avalaible when in the menu.

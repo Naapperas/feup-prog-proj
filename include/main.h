@@ -41,4 +41,4 @@ bool showMenu();
  * @param filename the name of the file to read.
  * @return std::vector<std::string> a vector with the lines of the file, or an empty vector if the file does not exist/an error occurs
  */
-std::vector<std::string> readFileLines(std::string filename)
+std::vector<std::string> readFileLines(std::string filename);
