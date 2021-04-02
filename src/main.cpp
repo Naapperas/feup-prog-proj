@@ -145,12 +145,10 @@ int main() {
 
     clearScreen();
 
-    while (true) {
-        if (showMenu()) { // we are to play the game, play it
-            clearScreen();
-            if (play()) // this function did not return 0 i.e. the game was played.
-                break;
-        } else break;
+    while (showMenu()) { // we are to play the game, play it
+        clearScreen();
+        if (play()) // this function did not return 0 i.e. the game was played.
+            break;
     }
 
     return 0;
