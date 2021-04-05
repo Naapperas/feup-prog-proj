@@ -14,10 +14,12 @@
 #include <iostream>
 #include <string> 
 #include <vector>
+#include <sstream>
 #include <fstream>
 
 //PROJECT includes
 #include "../include/main.h"
+#include "../include/game.h"
 
 // the relative path of the resources
 #define PATH "./resources/"
@@ -92,14 +94,14 @@ std::vector<std::string> readFileLines(std::string filename) {
 
         while (std::getline(f, line))   
             fileLines.push_back(line);      
+    
+        f.close();
     }
-
-    f.close();
 
     return fileLines;
 }
 
-bool play() {
+bool play(Board& board) {
 
     int option;
     std::vector<std::string> mapLines;
@@ -126,14 +128,82 @@ bool play() {
         if (!mapLines.empty()) // the file does exist, break out of input loop and play the game
             break;
         
-        std::cout << "The specified map doestd::cout, std::cins not exist, please choose another one." << std::endl;
+        std::cout << "The specified map does not exist, please choose another one." << std::endl;
     }
 
     clearScreen();
 
     //TODO: main game logic goes after this point in the code
 
+    fillBoard(board, mapLines);
+
+    while (board.player.alive && board.aliveRobots > 0) { // poll user input, move the player, move the robots, repeat...
+        break;
+    }
+
+    if (board.player.alive) { // game ended because all robots got stuck
+
+    } else { // game ended because player got caught
+
+    }
+
     return true;
+}
+
+void fillBoard(Board& board, std::vector<std::string> fileLines) {
+
+    std::stringstream ss;
+    int width, height;
+    char sep;
+
+    ss << fileLines.at(0);
+
+    ss >> height >> sep >> width;
+
+    if (sep != 'x') {
+        // error
+        std::cout << "Error" << std::endl;
+        return;
+    }
+
+    board.height = height, board.width = width;
+
+    for (int i = 1; i < fileLines.size(); i++) { // traverse every line in the file that is not the first
+
+        std::vector<char> lineChars;
+
+        auto line = fileLines.at(i);
+
+        for (int j = 0; j < line.size(); j++) { // traverse each char in the given line
+
+            char c = line.at(i);
+
+            if (c == 'R') { // we found a robot, store its position and add it to the collection of robots
+
+                Robot r;
+
+                r.x = j;
+                r.y = i;
+
+                board.robots.push_back(r);
+
+            } else if (c == 'H') { // we found the player, store its position
+                
+                Player p;
+
+                p.x = j;
+                p.y = i;
+
+                board.player = p;
+            }
+
+            lineChars.push_back(c);
+        }
+
+        board.gameBoard.push_back(lineChars);
+    }
+
+    board.aliveRobots = board.gameBoard.size();
 }
 
 /**
@@ -143,11 +213,13 @@ bool play() {
  */
 int main() {
 
+    Board board;
+
     clearScreen();
 
     while (showMenu()) { // we are to play the game, play it
         clearScreen();
-        if (play()) // this function did not return 0 i.e. the game was played.
+        if (play(board)) // this function did not return 0 i.e. the game was played.
             break;
     }
 
