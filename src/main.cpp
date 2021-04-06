@@ -80,7 +80,7 @@ bool showMenu() {
 }
 
 void waitForEnter() {
-    if (std::cin.peek() =='\n') std::cin.ignore(1);
+    if (std::cin.peek() =='\n') std::cin.ignore(1); // TODO: search for a better way to achieve this
 }
 
 std::vector<std::string> readFileLines(std::string filename) {
@@ -106,240 +106,6 @@ std::vector<std::string> readFileLines(std::string filename) {
     return fileLines;
 }
 
-bool pickMaze(std::vector<std::string>& mapLines) {
-
-    int option;
-
-    while (true) {
-
-        std::cout << "What is the maze that you want to play (1 through 99, or 0 to go back to the previous menu): ";
-        std::cin >> option;
-
-        if(!option) return false; // we want to go back to the previous menu
-
-        std::string mapFileName; 
-        mapFileName.append("MAZE_");
-        mapFileName.append(((option < 10) ? "0" : ""));
-        mapFileName.append(std::to_string(option));
-        mapFileName.append(".TXT");
-
-        mapLines = readFileLines(mapFileName);
-
-        // clean input buffer
-        std::cin.clear();
-        std::cin.ignore(10000, '\n');
-
-        if (!mapLines.empty()) // the file exists, signal that it does
-            return true;
-        
-        std::cout << "The specified maze does not exist, or an error has occured while trying to open the specified maze, please choose another one." << std::endl;
-    }
-
-}
-
-char pollPlayerMove() {
-        char move;
-        std::cout << "What move do you want to make: ";
-        std::cin >> move;
-        
-        std::cin.clear();
-        std::cin.ignore(1000, '\n');
-
-        return move;
-}
-
-Position getNewPlayerPosition(char playerMove, Board& board) {
-
-    auto prevPos = board.player.pos;
-    Position newPos;
-
-    switch (playerMove) {
-
-        case 'q': // up left 
-        case 'Q': {
-            newPos = {prevPos.x - 1, prevPos.y - 1};
-            break;
-        }
-
-        case 'w': // up
-        case 'W': {
-            newPos = {prevPos.x, prevPos.y - 1};
-            break;
-        }
-
-        case 'e': // up right
-        case 'E': {
-            newPos = {prevPos.x + 1, prevPos.y - 1};
-
-            break;
-        }
-
-        case 'a': // left
-        case 'A': {
-            newPos = {prevPos.x - 1, prevPos.y};
-
-            break;
-        }
-
-        case 's': // stay in place
-        case 'S': {
-            newPos = prevPos;
-            break;
-        }
-
-        case 'd': // right
-        case 'D': {
-            newPos = {prevPos.x + 1, prevPos.y};
-            break;
-        }
-
-        case 'z': // down left
-        case 'Z': {
-            newPos = {prevPos.x - 1, prevPos.y + 1};
-            break;
-        }
-
-        case 'x': // down 
-        case 'X': {
-            newPos = {prevPos.x, prevPos.y + 1};
-            break;
-        }
-
-        case 'c': // down right
-        case 'C': {
-            newPos = {prevPos.x + 1, prevPos.y + 1};
-            break;
-        }
-
-        default:
-            std::cout << "Invalid movement option, please input a valid movement" << std::endl;
-            throw false;
-
-    }
-
-    return newPos;
-
-}
-
-bool play(Board& board) {
-
-    int option;
-    std::vector<std::string> mapLines;
-
-    if(!pickMaze(mapLines)) return false; // we're signaled to go back to the previous menu, returning false causes the main function to continue iterating
-
-    clearScreen();
-
-    if(!fillBoard(board, mapLines)) // we're signaled to exit, returning true causes the main function to exit and thus terminate the program.
-        return true;
-
-    auto initTime = std::chrono::system_clock::now(); // the time at which the game started
-
-    while (board.player.alive && board.aliveRobots > 0) {
-
-        clearScreen();
-
-        printBoard(board);
-
-        char playerMove = pollPlayerMove();
-
-        Position newPlayerPos;
-        try {
-            newPlayerPos = getNewPlayerPosition(playerMove, board);
-        } catch (bool status) {
-            if(!status) continue;
-        }
-
-        if(isValidPlayerPosition(newPlayerPos, board)) {
-            movePlayer(newPlayerPos, board);
-        } else {
-            std::cout << "That is an invalid position to move into, please make another move" << std::endl;
-            continue;
-        }
-
-        printBoard(board);
-
-        //break; // poll user input, move the player, move the robots, repeat...
-    }
-
-    auto finalTime = std::chrono::system_clock::now(); // the time at which the game ended
-
-    auto score = std::chrono::duration_cast<std::chrono::seconds>(finalTime - initTime).count();
-
-    if (board.player.alive) { // game ended because all robots got stuck
-
-    } else { // game ended because player got caught
-
-    }
-
-    return true;
-}
-
-bool fillBoard(Board& board, const std::vector<std::string>& fileLines) {
-
-    std::stringstream ss;
-    int width, height;
-    char sep;
-
-    ss << fileLines.at(0);
-
-    ss >> height >> sep >> width;
-
-    if (sep != 'x') {
-        // error
-        std::cout << "Error when filling board, exiting" << std::endl;
-        return false;
-    }
-
-    board.height = height, board.width = width;
-
-    for (int i = 1; i < fileLines.size(); i++) { // traverse every line in the file that is not the first
-
-        std::vector<char> lineChars;
-
-        auto line = fileLines.at(i);
-        
-        for (int j = 0; j < line.size(); j++) { // traverse each char in the given line
-
-            char c = line.at(j);
-
-            Position pos = {j, i-1};
-
-            switch (c) {
- 
-                case '*': // found a post/eletric fence, store its position
-                    board.eletricObstacles.push_back(pos);
-                    break;
-
-                case 'R': // we found a robot, store its position and add it to the collection of robots
-                    Robot r;
-
-                    r.pos = pos;
-
-                    board.robots.push_back(r);
-                    break;
-                
-                case 'H': // we found the player, store its position
-                    Player p;
-
-                    p.pos = pos;
-
-                    board.player = p;
-                    break;
-
-            };
-
-            lineChars.push_back(c);
-        }
-
-        board.gameBoard.push_back(lineChars);
-    }
-
-    board.aliveRobots = board.robots.size();
-
-    return true;
-}
-
 void printBoard(const Board& board) {
 
     for (auto line : board.gameBoard) {
@@ -350,17 +116,6 @@ void printBoard(const Board& board) {
     }
 
     std::cout << std::endl;
-}
-
-bool isValidPlayerPosition(const Position& pos, const Board& board) {
-    return board.gameBoard.at(pos.y).at(pos.x) == ' '; // TODO: improve this check
-}
-
-void movePlayer(const Position& newPos, Board& board) {
-    auto prevPos = board.player.pos;
-    board.gameBoard.at(prevPos.y).at(prevPos.x) = ' ';
-    board.gameBoard.at(newPos.y).at(newPos.x) = 'H';
-    board.player.pos = newPos;
 }
 
 /**
@@ -375,9 +130,9 @@ int main() {
     clearScreen();
 
     while (showMenu()) { // we are to play the game, play it
+        
         clearScreen();
-        if (play(board)) // this function did not return 0 i.e. the game was played.
-            break;
+        
     }
 
     return 0;
