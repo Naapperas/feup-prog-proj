@@ -38,6 +38,12 @@ void showRules();
 bool showMenu();
 
 /**
+ * @brief Waits for the enter key to be pressed.
+ * 
+ */
+void waitForEnter();
+
+/**
  * @brief Reads a file given by the specified filename and returns a vector containing every line in the file.
  * 
  * @param filename the name of the file to read.

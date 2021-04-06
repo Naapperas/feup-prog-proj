@@ -17,13 +17,22 @@
 #include <string>
 
 /**
+ * @brief Simple struct for representing a pair of coordinates.
+ * 
+ */
+struct Position {
+
+    int x, y;
+};
+
+/**
  * @brief The 'Robot' entity.
  * 
  */
 struct Robot { 
     
     // the coords of this robot
-    int x, y;
+    Position pos;
 };
 
 /**
@@ -33,7 +42,7 @@ struct Robot {
 struct Player { 
     
     // the coords of this robot
-    int x, y;
+    Position pos;
 
     bool alive = true;
 };
@@ -53,6 +62,8 @@ struct Board {
     std::vector<Robot> robots;
     unsigned int aliveRobots = 0;
 
+    std::vector<Position> eletricObstacles;
+
     Player player;
 
 };
@@ -69,5 +80,14 @@ bool play(Board& board);
  * @brief Fills a Board object with the fences/posts/robots/player.
  * 
  * @param board the board object on which to play the game
+ * @return true if no errors occur, false otherwise
  */
-void fillBoard(Board& board, const std::vector<std::string>& fileLines);
+bool fillBoard(Board& board, const std::vector<std::string>& fileLines);
+
+/**
+ * @brief 
+ * 
+ * @param mapLines 
+ * @return true 
+ */
+bool pickMaze(std::vector<std::string>& mapLines);

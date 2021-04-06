@@ -38,20 +38,20 @@ void clearScreen() {
 }
 
 void showRules() { 
-    // declare this function inline to let the compiler generate more efficient code, since this is only a handfull of console prints.
     
     clearScreen();
-    std::cout << "This is a robot maze game.\nYour goal is to escape all of the robots that exist in the labirinth.\nBut beaware: the fences and posts are electric, and you will get electrocuted if you touch them. So, you know... don't.\nEach time you make a move, the robots also move, and they will always move towards you in the direction of the shortest path.\nUse the:\n-AWDX keys to move vertically and horizontally.\n-QECZ keys to move diagonally.\n-S key to stay in place.\n\nIf you get captured by one of the robots or touch the fences/posts, you lose. If not, you win.\nRobots that collide with each other get destroyed/stuck, obstructing a cell that you can't move into.\nThat said, good luck.\n" << std::endl;
+    std::cout << "This is a robot maze game.\n\nYour goal is to escape all of the robots that exist in the labirinth.\nBut beaware: the fences and posts are electric, and you will get electrocuted if you touch them. So, you know... don't.\nEach time you make a move, the robots also move, and they will always move towards you in the direction of the shortest path.\nUse the:\n-AWDX keys to move vertically and horizontally.\n-QECZ keys to move diagonally.\n-S key to stay in place.\n\nIf you get captured by one of the robots or touch the fences/posts, you lose. If not, you win.\nRobots that collide with each other get destroyed/stuck, obstructing a cell that you can't move into.\nThat said, good luck.\n" << std::endl;
 }
 
 bool showMenu() {
     
     int response;
 
-    std::cout << "Robot Maze" << '\n' ;
+    std::cout << "Robot Maze" << "\n\n" << "Menu:";
     
     while (true) {
-        std::cout << "Menu:" << '\n' << "1) Rules" << '\n' << "2) Play" << '\n' << "0) Exit" << '\n' << "Option: ";
+
+        std::cout << '\n' << "1) Rules" << '\n' << "2) Play" << '\n' << "0) Exit" << "\n\n" << "Option: ";
         std::cin >> response;
 
         // clean input
@@ -72,9 +72,13 @@ bool showMenu() {
                 return false;
             
             default:
-                std::cout << "Invalid option, please input a valid option out of the list.";
+                std::cout << "\nInvalid option, please input a valid option out of the list.\n" << std::endl;
         };
     }
+}
+
+void waitForEnter() {
+    if (std::cin.peek() =='\n') std::cin.ignore(1);
 }
 
 std::vector<std::string> readFileLines(std::string filename) {
@@ -102,10 +106,9 @@ std::vector<std::string> readFileLines(std::string filename) {
     return fileLines;
 }
 
-bool play(Board& board) {
+bool pickMaze(std::vector<std::string>& mapLines) {
 
     int option;
-    std::vector<std::string> mapLines;
 
     while (true) {
 
@@ -118,7 +121,7 @@ bool play(Board& board) {
         mapFileName.append("MAZE_");
         mapFileName.append(((option < 10) ? "0" : ""));
         mapFileName.append(std::to_string(option));
-        mapFileName.append(".txt");
+        mapFileName.append(".TXT");
 
         mapLines = readFileLines(mapFileName);
 
@@ -126,17 +129,27 @@ bool play(Board& board) {
         std::cin.clear();
         std::cin.ignore(10000, '\n');
 
-        if (!mapLines.empty()) // the file does exist, break out of input loop and play the game
-            break;
+        if (!mapLines.empty()) // the file exists, signal that it does
+            return true;
         
-        std::cout << "The specified map does not exist, please choose another one." << std::endl;
+        std::cout << "The specified maze does not exist, or an error has occured while trying to open the specified maze, please choose another one." << std::endl;
     }
+
+}
+
+bool play(Board& board) {
+
+    int option;
+    std::vector<std::string> mapLines;
+
+    if(!pickMaze(mapLines)) return false; // we're signaled to go back to the previous menu, returning false causes the main function to continue iterating
 
     clearScreen();
 
     //TODO: main game logic goes after this point in the code
 
-    fillBoard(board, mapLines);
+    if(!fillBoard(board, mapLines)) // we're signaled to exit, returning true causes the main function to exit and thus terminate the program.
+        return true;
 
     auto initTime = std::chrono::system_clock::now(); // the time at which the game started
 
@@ -146,8 +159,11 @@ bool play(Board& board) {
 
         printBoard(board);
 
-        char t;
-        std::cin >> t;
+        waitForEnter();
+
+        int i, j;
+
+        std::swap(i, j);
 
         break; // poll user input, move the player, move the robots, repeat...
     }
@@ -165,7 +181,7 @@ bool play(Board& board) {
     return true;
 }
 
-void fillBoard(Board& board, const std::vector<std::string>& fileLines) {
+bool fillBoard(Board& board, const std::vector<std::string>& fileLines) {
 
     std::stringstream ss;
     int width, height;
@@ -177,8 +193,8 @@ void fillBoard(Board& board, const std::vector<std::string>& fileLines) {
 
     if (sep != 'x') {
         // error
-        std::cout << "Error" << std::endl;
-        return;
+        std::cout << "Error when filling board, exiting" << std::endl;
+        return false;
     }
 
     board.height = height, board.width = width;
@@ -193,24 +209,29 @@ void fillBoard(Board& board, const std::vector<std::string>& fileLines) {
 
             char c = line.at(j);
 
-            if (c == 'R') { // we found a robot, store its position and add it to the collection of robots
+            switch (c) {
+ 
+                case '*': // found a post/eletric fence, store its position
+                    board.eletricObstacles.push_back({j, i});
+                    break;
 
-                Robot r;
+                case 'R': // we found a robot, store its position and add it to the collection of robots
+                    Robot r;
 
-                r.x = j;
-                r.y = i;
+                    r.pos = {j, i};
 
-                board.robots.push_back(r);
-
-            } else if (c == 'H') { // we found the player, store its position
+                    board.robots.push_back(r);
+                    break;
                 
-                Player p;
+                case 'H': // we found the player, store its position
+                    Player p;
 
-                p.x = j;
-                p.y = i;
+                    p.pos = {j, i};
 
-                board.player = p;
-            }
+                    board.player = p;
+                    break;
+
+            };
 
             lineChars.push_back(c);
         }
@@ -219,6 +240,8 @@ void fillBoard(Board& board, const std::vector<std::string>& fileLines) {
     }
 
     board.aliveRobots = board.robots.size();
+
+    return true;
 }
 
 void printBoard(const Board& board) {
