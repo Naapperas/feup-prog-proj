@@ -148,7 +148,7 @@ char pollPlayerMove() {
         return move;
 }
 
-void movePlayer(char playerMove, Board& board) {
+Position getNewPlayerPosition(char playerMove, Board& board) {
 
     auto prevPos = board.player.pos;
     Position newPos;
@@ -183,7 +183,7 @@ void movePlayer(char playerMove, Board& board) {
 
         case 's': // stay in place
         case 'S': {
-            newPos = {prevPos.x, prevPos.y};
+            newPos = prevPos;
             break;
         }
 
@@ -213,13 +213,11 @@ void movePlayer(char playerMove, Board& board) {
 
         default:
             std::cout << "Invalid movement option, please input a valid movement" << std::endl;
-            return;
+            throw false;
 
     }
 
-    board.gameBoard.at(prevPos.y).at(prevPos.x) = ' ';
-    board.gameBoard.at(newPos.y).at(newPos.x) = 'H';
-    board.player.pos = newPos;
+    return newPos;
 
 }
 
@@ -245,7 +243,19 @@ bool play(Board& board) {
 
         char playerMove = pollPlayerMove();
 
-        movePlayer(playerMove, board);
+        Position newPlayerPos;
+        try {
+            newPlayerPos = getNewPlayerPosition(playerMove, board);
+        } catch (bool status) {
+            if(!status) continue;
+        }
+
+        if(isValidPlayerPosition(newPlayerPos, board)) {
+            movePlayer(newPlayerPos, board);
+        } else {
+            std::cout << "That is an invalid position to move into, please make another move" << std::endl;
+            continue;
+        }
 
         printBoard(board);
 
@@ -341,7 +351,18 @@ void printBoard(const Board& board) {
 
     std::cout << std::endl;
 }
- 
+
+bool isValidPlayerPosition(const Position& pos, const Board& board) {
+    return board.gameBoard.at(pos.y).at(pos.x) == ' '; // TODO: improve this check
+}
+
+void movePlayer(const Position& newPos, Board& board) {
+    auto prevPos = board.player.pos;
+    board.gameBoard.at(prevPos.y).at(prevPos.x) = ' ';
+    board.gameBoard.at(newPos.y).at(newPos.x) = 'H';
+    board.player.pos = newPos;
+}
+
 /**
  * @brief This is the entrypoint for the program itself, required by the compiler.
  * 

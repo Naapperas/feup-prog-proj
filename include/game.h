@@ -104,4 +104,22 @@ char pollPlayerMove();
  * 
  * @param playerMove 
  */
-void movePlayer(char playerMove, Board& board);
+Position getNewPlayerPosition(char playerMove, const Board& board);
+
+/**
+ * @brief 
+ * 
+ * @param pos 
+ * @param board 
+ * @return true 
+ * @return false 
+ */
+bool isValidPlayerPosition(const Position& pos, const Board& board);
+
+/**
+ * @brief 
+ * 
+ * @param pos 
+ * @param board 
+ */
+void movePlayer(const Position& pos, Board& board);
