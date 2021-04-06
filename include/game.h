@@ -70,4 +70,4 @@ bool play(Board& board);
  * 
  * @param board the board object on which to play the game
  */
-void fillBoard(Board& board, std::vector<std::string> fileLines);
+void fillBoard(Board& board, const std::vector<std::string>& fileLines);

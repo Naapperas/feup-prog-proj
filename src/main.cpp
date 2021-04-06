@@ -16,6 +16,7 @@
 #include <vector>
 #include <sstream>
 #include <fstream>
+#include <chrono>
 
 //PROJECT includes
 #include "../include/main.h"
@@ -137,9 +138,23 @@ bool play(Board& board) {
 
     fillBoard(board, mapLines);
 
-    while (board.player.alive && board.aliveRobots > 0) { // poll user input, move the player, move the robots, repeat...
-        break;
+    auto initTime = std::chrono::system_clock::now(); // the time at which the game started
+
+    while (board.player.alive && board.aliveRobots > 0) {
+
+        clearScreen();
+
+        printBoard(board);
+
+        char t;
+        std::cin >> t;
+
+        break; // poll user input, move the player, move the robots, repeat...
     }
+
+    auto finalTime = std::chrono::system_clock::now(); // the time at which the game ended
+
+    auto score = std::chrono::duration_cast<std::chrono::seconds>(finalTime - initTime).count();
 
     if (board.player.alive) { // game ended because all robots got stuck
 
@@ -150,7 +165,7 @@ bool play(Board& board) {
     return true;
 }
 
-void fillBoard(Board& board, std::vector<std::string> fileLines) {
+void fillBoard(Board& board, const std::vector<std::string>& fileLines) {
 
     std::stringstream ss;
     int width, height;
@@ -173,10 +188,10 @@ void fillBoard(Board& board, std::vector<std::string> fileLines) {
         std::vector<char> lineChars;
 
         auto line = fileLines.at(i);
-
+        
         for (int j = 0; j < line.size(); j++) { // traverse each char in the given line
 
-            char c = line.at(i);
+            char c = line.at(j);
 
             if (c == 'R') { // we found a robot, store its position and add it to the collection of robots
 
@@ -203,9 +218,21 @@ void fillBoard(Board& board, std::vector<std::string> fileLines) {
         board.gameBoard.push_back(lineChars);
     }
 
-    board.aliveRobots = board.gameBoard.size();
+    board.aliveRobots = board.robots.size();
 }
 
+void printBoard(const Board& board) {
+
+    for (auto line : board.gameBoard) {
+        for (char c : line)
+            std::cout << c;
+
+        std::cout << '\n';
+    }
+
+    std::cout << std::endl;
+}
+ 
 /**
  * @brief This is the entrypoint for the program itself, required by the compiler.
  * 

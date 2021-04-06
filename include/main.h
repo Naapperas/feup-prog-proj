@@ -15,6 +15,8 @@
 #include <vector>
 #include <string>
 
+#include "game.h"
+
 /**
  * @brief Clears the screen so the console appears non-dirty.
  * 
@@ -42,3 +44,10 @@ bool showMenu();
  * @return std::vector<std::string> a vector with the lines of the file, or an empty vector if the file does not exist/an error occurs
  */
 std::vector<std::string> readFileLines(std::string filename);
+
+/**
+ * @brief Prints the specified board to the screen.
+ * 
+ * @param board the board to print
+ */
+void printBoard(const Board& board);
