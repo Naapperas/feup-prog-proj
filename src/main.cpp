@@ -132,8 +132,11 @@ int main() {
     while (showMenu()) { // we are to play the game, play it
         
         clearScreen();
-        
+        break;
     }
+
+    Position p = {1, 2}, q = {1, 2};
+    std::cout << (p == q) << std::endl;
 
     return 0;
 }

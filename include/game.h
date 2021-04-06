@@ -26,6 +26,15 @@ struct Position {
 };
 
 /**
+ * @brief Check if to positions are equal.
+ * 
+ * @param p1 the first position
+ * @param p2 the second position
+ * @return true if the positionsare the same, false otherwise
+ */
+bool operator==(Position p1, Position p2);
+
+/**
  * @brief The 'Robot' entity.
  * 
  */
@@ -68,58 +77,3 @@ struct Board {
 
 };
 
-/**
- * @brief Starts to play the game. At this point, the user is asked to choose a number between 1 and 99 to play the respective maze, or 0 to return to the initial menu. 
- * 
- * @param board the board on which to play the game
- * @return true if a map was chosen, false otherwise
- */
-bool play(Board& board);
-
-/**
- * @brief Fills a Board object with the fences/posts/robots/player.
- * 
- * @param board the board object on which to play the game
- * @return true if no errors occur, false otherwise
- */
-bool fillBoard(Board& board, const std::vector<std::string>& fileLines);
-
-/**
- * @brief Picks a maze to play, if it exists
- * 
- * @param mapLines the vector thats is passed by reference to contain the lines of the maze file chosen
- * @return true if a valid maze was chosen, or false if the user entered '0'
- */
-bool pickMaze(std::vector<std::string>& mapLines);
-
-/**
- * @brief 
- * 
- * @return char 
- */
-char pollPlayerMove();
-
-/**
- * @brief 
- * 
- * @param playerMove 
- */
-Position getNewPlayerPosition(char playerMove, const Board& board);
-
-/**
- * @brief 
- * 
- * @param pos 
- * @param board 
- * @return true 
- * @return false 
- */
-bool isValidPlayerPosition(const Position& pos, const Board& board);
-
-/**
- * @brief 
- * 
- * @param pos 
- * @param board 
- */
-void movePlayer(const Position& pos, Board& board);
