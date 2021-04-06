@@ -85,9 +85,23 @@ bool play(Board& board);
 bool fillBoard(Board& board, const std::vector<std::string>& fileLines);
 
 /**
- * @brief 
+ * @brief Picks a maze to play, if it exists
  * 
- * @param mapLines 
- * @return true 
+ * @param mapLines the vector thats is passed by reference to contain the lines of the maze file chosen
+ * @return true if a valid maze was chosen, or false if the user entered '0'
  */
 bool pickMaze(std::vector<std::string>& mapLines);
+
+/**
+ * @brief 
+ * 
+ * @return char 
+ */
+char pollPlayerMove();
+
+/**
+ * @brief 
+ * 
+ * @param playerMove 
+ */
+void movePlayer(char playerMove, Board& board);

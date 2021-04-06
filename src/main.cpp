@@ -25,6 +25,8 @@
 // the relative path of the resources
 #define PATH "./resources/"
 
+// TODO: implement functionality first, refactor code later
+
 /**
  * @brief Options avalaible when in the menu.
  * 
@@ -83,8 +85,6 @@ void waitForEnter() {
 
 std::vector<std::string> readFileLines(std::string filename) {
 
-    //FIXME: remove inline declaration, as it might not be performant, find a fix for this problem
-
     std::vector<std::string> fileLines;
 
     std::fstream f;
@@ -137,6 +137,92 @@ bool pickMaze(std::vector<std::string>& mapLines) {
 
 }
 
+char pollPlayerMove() {
+        char move;
+        std::cout << "What move do you want to make: ";
+        std::cin >> move;
+        
+        std::cin.clear();
+        std::cin.ignore(1000, '\n');
+
+        return move;
+}
+
+void movePlayer(char playerMove, Board& board) {
+
+    auto prevPos = board.player.pos;
+    Position newPos;
+
+    switch (playerMove) {
+
+        case 'q': // up left 
+        case 'Q': {
+            newPos = {prevPos.x - 1, prevPos.y - 1};
+            break;
+        }
+
+        case 'w': // up
+        case 'W': {
+            newPos = {prevPos.x, prevPos.y - 1};
+            break;
+        }
+
+        case 'e': // up right
+        case 'E': {
+            newPos = {prevPos.x + 1, prevPos.y - 1};
+
+            break;
+        }
+
+        case 'a': // left
+        case 'A': {
+            newPos = {prevPos.x - 1, prevPos.y};
+
+            break;
+        }
+
+        case 's': // stay in place
+        case 'S': {
+            newPos = {prevPos.x, prevPos.y};
+            break;
+        }
+
+        case 'd': // right
+        case 'D': {
+            newPos = {prevPos.x + 1, prevPos.y};
+            break;
+        }
+
+        case 'z': // down left
+        case 'Z': {
+            newPos = {prevPos.x - 1, prevPos.y + 1};
+            break;
+        }
+
+        case 'x': // down 
+        case 'X': {
+            newPos = {prevPos.x, prevPos.y + 1};
+            break;
+        }
+
+        case 'c': // down right
+        case 'C': {
+            newPos = {prevPos.x + 1, prevPos.y + 1};
+            break;
+        }
+
+        default:
+            std::cout << "Invalid movement option, please input a valid movement" << std::endl;
+            return;
+
+    }
+
+    board.gameBoard.at(prevPos.y).at(prevPos.x) = ' ';
+    board.gameBoard.at(newPos.y).at(newPos.x) = 'H';
+    board.player.pos = newPos;
+
+}
+
 bool play(Board& board) {
 
     int option;
@@ -145,8 +231,6 @@ bool play(Board& board) {
     if(!pickMaze(mapLines)) return false; // we're signaled to go back to the previous menu, returning false causes the main function to continue iterating
 
     clearScreen();
-
-    //TODO: main game logic goes after this point in the code
 
     if(!fillBoard(board, mapLines)) // we're signaled to exit, returning true causes the main function to exit and thus terminate the program.
         return true;
@@ -159,13 +243,13 @@ bool play(Board& board) {
 
         printBoard(board);
 
-        waitForEnter();
+        char playerMove = pollPlayerMove();
 
-        int i, j;
+        movePlayer(playerMove, board);
 
-        std::swap(i, j);
+        printBoard(board);
 
-        break; // poll user input, move the player, move the robots, repeat...
+        //break; // poll user input, move the player, move the robots, repeat...
     }
 
     auto finalTime = std::chrono::system_clock::now(); // the time at which the game ended
@@ -209,16 +293,18 @@ bool fillBoard(Board& board, const std::vector<std::string>& fileLines) {
 
             char c = line.at(j);
 
+            Position pos = {j, i-1};
+
             switch (c) {
  
                 case '*': // found a post/eletric fence, store its position
-                    board.eletricObstacles.push_back({j, i});
+                    board.eletricObstacles.push_back(pos);
                     break;
 
                 case 'R': // we found a robot, store its position and add it to the collection of robots
                     Robot r;
 
-                    r.pos = {j, i};
+                    r.pos = pos;
 
                     board.robots.push_back(r);
                     break;
@@ -226,7 +312,7 @@ bool fillBoard(Board& board, const std::vector<std::string>& fileLines) {
                 case 'H': // we found the player, store its position
                     Player p;
 
-                    p.pos = {j, i};
+                    p.pos = pos;
 
                     board.player = p;
                     break;
