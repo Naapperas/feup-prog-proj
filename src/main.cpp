@@ -17,13 +17,17 @@
 #include <sstream>
 #include <fstream>
 #include <chrono>
+#include <limits>
 
 //PROJECT includes
 #include "../include/main.h"
 #include "../include/game.h"
 
-// the relative path of the resources
+// the relative path of the resources, to be changed when project is submitted
 #define PATH "./resources/"
+
+// the max number of chars that a stream can hold, used for clearing the standard input 
+#define MAX_CHARS std::numeric_limits <std::streamsize>::max()
 
 // TODO: implement functionality first, refactor code later
 
@@ -40,7 +44,7 @@ bool operator==(const Position& pos1, const Position& pos2) {
 }
 
 void clearScreen() {
-    std::cout << std::string(100, '\n') << std::endl;
+    std::cout << std::string(500, '\n') << std::endl; // 500 should be a large enough number for the user not to scroll up
 }
 
 void showRules() { 
@@ -57,12 +61,14 @@ bool showMenu() {
     
     while (true) {
 
+        std::string responseStr;
+
         std::cout << '\n' << "1) Rules" << '\n' << "2) Play" << '\n' << "0) Exit" << "\n\n" << "Option: ";
-        std::cin >> response;
+        std::cin >> responseStr;
 
         // clean input
         std::cin.clear();
-        std::cin.ignore(10000, '\n');
+        std::cin.ignore(MAX_CHARS, '\n');
 
         // Sanitize response, i.e., if response is not one of the options, inform the player.
 
@@ -85,7 +91,8 @@ bool showMenu() {
 }
 
 void waitForEnter() {
-    if (std::cin.peek() =='\n') std::cin.ignore(1); // TODO: search for a better way to achieve this
+    std::cout << "Press ENTER to continue..." << std::endl;
+    if (std::cin.peek() =='\n') std::cin.ignore(MAX_CHARS, '\n'); // if we 
 }
 
 std::vector<std::string> readFileLines(std::string filename) {
@@ -135,7 +142,7 @@ std::string pickMaze() {
 
         // clean input stream
         std::cin.clear();
-        std::cin.ignore(10000, '\n');
+        std::cin.ignore(MAX_CHARS, '\n');
 
         clearScreen();
         if (!mazeNumber) return "RETURN"; // the user wishes to go back to the previous menu, return special string indicating so
@@ -183,20 +190,27 @@ int main() {
 
     clearScreen();
 
-    while (showMenu()) { // we are to play the game, play it
-        
+    std::string mazeName = "NO_MAZE"; // initialize this string with this value to indicate that no maze has been selected, should be altered in the following loop if the player chooses to play the game
+    while (showMenu()) { // show the menu, ask for a maze to pick, rinse and repeat until we get an existing maze
+
         clearScreen();
 
         // first we need to chose a maze to play.
 
-        auto mazeName = pickMaze();
+        mazeName = pickMaze();
 
-        if (mazeName == "RETURN") continue; // we want to go back to the previous menu
+        if (mazeName != "RETURN") break; // if 'pickMaze' returns "RETURNS", we should iterate again through the menu.
+    }
+
+    if(mazeName != "NO_MAZE") { // user might leave right away, test if the file name is the initialized
 
         // at this point it is garanteed that the file exists, so we can just read it;
         auto fileLines = readFileLines(mazeName);
-
     }
+
+    waitForEnter();
+
+    std::cout << "Until next time :-)" << std::endl;
 
     return 0;
 }
