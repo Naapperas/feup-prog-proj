@@ -64,9 +64,9 @@ bool showMenu() {
         char responseStr;
 
         std::cout << '\n' << "1) Rules" << '\n' << "2) Play" << '\n' << "0) Exit" << "\n\n" << "Option: ";
-        std::cin >> responseStr;
+        std::cin >> responseStr; // even if the user inputs multidigit number, we only look at the first character, because the input should only be one digit
 
-        if (responseStr < '0' || responseStr > '9'){
+        if (responseStr < '0' || responseStr > '9') { // if input is not a digit
             clearScreen();
             std::cout << "\nPlease input a number.\n" << std::endl;
             continue;
