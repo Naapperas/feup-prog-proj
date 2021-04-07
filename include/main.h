@@ -57,3 +57,11 @@ std::vector<std::string> readFileLines(std::string filename);
  * @param board the board to print
  */
 void printBoard(const Board& board);
+
+/**
+ * @brief Checks if the given file exists or not.
+ * 
+ * @param filename the name of the file to check
+ * @return true if the file exists, false otherwise
+ */
+bool fileExists(std::string filename);

@@ -26,13 +26,13 @@ struct Position {
 };
 
 /**
- * @brief Check if to positions are equal.
+ * @brief Check if two positions are equal.
  * 
  * @param p1 the first position
  * @param p2 the second position
- * @return true if the positionsare the same, false otherwise
+ * @return true if the positions are the same, false otherwise
  */
-bool operator==(Position p1, Position p2);
+bool operator==(const Position& p1, const Position& p2); // no need to declare this as a friend function because structs are public by nature
 
 /**
  * @brief The 'Robot' entity.
@@ -42,6 +42,8 @@ struct Robot {
     
     // the coords of this robot
     Position pos;
+
+    bool alive = true;
 };
 
 /**
@@ -77,3 +79,9 @@ struct Board {
 
 };
 
+/**
+ * @brief Asks the user for a maze to play and returns the respective maze file name.
+ * 
+ * @return std::string the name of the maze file to read
+ */
+std::string pickMaze();

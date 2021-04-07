@@ -35,6 +35,10 @@ enum GameMenuOption {
     EXIT, RULES, PLAY
 };
 
+bool operator==(const Position& pos1, const Position& pos2) {
+    return pos1.x == pos2.x && pos1.y == pos2.y;
+}
+
 void clearScreen() {
     std::cout << std::string(100, '\n') << std::endl;
 }
@@ -74,6 +78,7 @@ bool showMenu() {
                 return false;
             
             default:
+                clearScreen();
                 std::cout << "\nInvalid option, please input a valid option out of the list.\n" << std::endl;
         };
     }
@@ -118,6 +123,54 @@ void printBoard(const Board& board) {
     std::cout << std::endl;
 }
 
+std::string pickMaze() {
+
+    int mazeNumber;
+
+    while (true) { // make while (true) because the user can keep giving wrong inputs, maybe change later ?
+        
+        std::cout << "Write the number, from 1 to 99, of the maze you want to play.\nIf you wish to return to the previous menu enter 0 instead.\n" << std::endl; // flush this string immediately
+        std::cout << "Maze number: ";
+        std::cin >> mazeNumber;
+
+        std::cin.clear();
+        std::cin.ignore(10000, '\n');
+
+        clearScreen();
+        if (!mazeNumber) return "RETURN"; // the user wishes to go back to the previous menu, return special string indicating so
+
+        // check if number is within boundaries
+
+        if (mazeNumber < 0 || mazeNumber > 99) {
+            std::cout << "\nThe specified number is out of bounds, please input another number.\n" << std::endl;
+            continue;
+        }
+
+        // build the file name
+
+        auto mazeFileName = std::string("MAZE_") + ((mazeNumber < 10) ? "0" : "") + std::to_string(mazeNumber) + ".TXT";
+
+        // check if file file exists
+
+        if(fileExists(mazeFileName)) return mazeFileName;
+
+        std::cout << "The given maze does not exist. Please choose another maze to play.\n" << std::endl;
+
+    }
+}
+
+bool fileExists(std::string fileName) {
+
+    std::ifstream file(PATH + fileName);
+
+    if (file.is_open()) {
+        file.close();
+        return true;
+    }
+
+    return false; // default behavior
+}
+
 /**
  * @brief This is the entrypoint for the program itself, required by the compiler.
  * 
@@ -132,11 +185,16 @@ int main() {
     while (showMenu()) { // we are to play the game, play it
         
         clearScreen();
-        break;
-    }
 
-    Position p = {1, 2}, q = {1, 2};
-    std::cout << (p == q) << std::endl;
+        // first we need to chose a maze to play.
+
+        auto mazeName = pickMaze();
+
+        if (mazeName == "RETURN") continue; // we want to go back to the previous menu
+
+        auto fileLines = readFileLines(mazeName);
+
+    }
 
     return 0;
 }
