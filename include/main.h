@@ -52,13 +52,6 @@ void waitForEnter();
 std::vector<std::string> readFileLines(std::string filename);
 
 /**
- * @brief Prints the specified board to the screen.
- * 
- * @param board the board to print
- */
-void printBoard(const Board& board);
-
-/**
  * @brief Checks if the given file exists or not.
  * 
  * @param filename the name of the file to check

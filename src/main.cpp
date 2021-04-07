@@ -133,6 +133,7 @@ std::string pickMaze() {
         std::cout << "Maze number: ";
         std::cin >> mazeNumber;
 
+        // clean input stream
         std::cin.clear();
         std::cin.ignore(10000, '\n');
 
@@ -165,7 +166,7 @@ bool fileExists(std::string fileName) {
 
     if (file.is_open()) {
         file.close();
-        return true;
+        return file.good(); // the file could be deleted by an external process unknown to us, by returning 'file.good()' we ensure that even if the file does get deleted, the correct status is returned.
     }
 
     return false; // default behavior
@@ -192,6 +193,7 @@ int main() {
 
         if (mazeName == "RETURN") continue; // we want to go back to the previous menu
 
+        // at this point it is garanteed that the file exists, so we can just read it;
         auto fileLines = readFileLines(mazeName);
 
     }

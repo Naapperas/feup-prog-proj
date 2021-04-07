@@ -80,6 +80,13 @@ struct Board {
 };
 
 /**
+ * @brief Prints the specified board to the screen.
+ * 
+ * @param board the board to print
+ */
+void printBoard(const Board& board);
+
+/**
  * @brief Asks the user for a maze to play and returns the respective maze file name.
  * 
  * @return std::string the name of the maze file to read
