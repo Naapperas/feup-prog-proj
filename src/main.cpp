@@ -61,10 +61,18 @@ bool showMenu() {
     
     while (true) {
 
-        std::string responseStr;
+        char responseStr;
 
         std::cout << '\n' << "1) Rules" << '\n' << "2) Play" << '\n' << "0) Exit" << "\n\n" << "Option: ";
         std::cin >> responseStr;
+
+        if (responseStr < '0' || responseStr > '9'){
+            clearScreen();
+            std::cout << "\nPlease input a number.\n" << std::endl;
+            continue;
+        }
+
+        response = responseStr - '0';
 
         // clean input
         std::cin.clear();
