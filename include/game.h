@@ -32,7 +32,7 @@ struct Position {
  * @param p2 the second position
  * @return true if the positions are the same, false otherwise
  */
-bool operator==(const Position& p1, const Position& p2); // no need to declare this as a friend function because structs are public by nature
+inline bool operator==(const Position& p1, const Position& p2); // no need to declare this as a friend function because structs are public by nature
 
 /**
  * @brief The 'Robot' entity.
@@ -100,3 +100,26 @@ std::string pickMaze();
  * @param board the board to full with charatchers
  */
 void fillBoard(Board& board, const std::vector<std::string>& fileLines);
+
+/**
+ * @brief get the next movement of the player.
+ * 
+ * @return char the char representing the next movement of the player
+ */
+char getMovementInput();
+
+/**
+ * @brief Moves the player in the board.
+ * 
+ * @param board the board in which to move the player
+ */
+void movePlayer(Board &board);
+
+/**
+ * @brief Checks if the given position is valid for the player to move to
+ * 
+ * @param board the game board
+ * @param pos the new desired position for the player
+ * @return true if the given position is valid , false otherwise
+ */
+bool isValidPlayerPosition(const Board& board, const Position& pos);

@@ -18,6 +18,7 @@
 #include <fstream>
 #include <chrono>
 #include <limits>
+#include <algorithm>
 
 //PROJECT includes
 #include "../include/main.h"
@@ -39,12 +40,19 @@ enum GameMenuOption {
     EXIT, RULES, PLAY
 };
 
-bool operator==(const Position& pos1, const Position& pos2) {
+inline bool operator==(const Position& pos1, const Position& pos2) {
     return pos1.x == pos2.x && pos1.y == pos2.y;
 }
 
 inline void clearScreen() {
     std::cout << std::string(500, '\n') << std::endl; // 500 should be a large enough number for the user not to scroll up
+}
+
+inline void clearInput() {
+   
+    // clean input
+    std::cin.clear();
+    std::cin.ignore(MAX_CHARS, '\n');
 }
 
 inline void showRules() { 
@@ -55,6 +63,8 @@ inline void showRules() {
 
 bool showMenu() {
     
+    // TODO: refactor this function to make it more expressive
+
     int response;
 
     std::cout << "Robot Maze" << "\n\n" << "Menu:";
@@ -64,7 +74,7 @@ bool showMenu() {
         char responseChar;
 
         std::cout << '\n' << "1) Rules" << '\n' << "2) Play" << '\n' << "0) Exit" << "\n\n" << "Option: ";
-        std::cin >> responseChar; // even if the user inputs multidigit number, we only look at the first character, because the input should only be one digit
+        std::cin >> responseChar; // even if the user inputs a multidigit number, we only look at the first character, because the input should only be one digit
 
         if (responseChar < '0' || responseChar > '9') { // if input is not a digit
             clearScreen();
@@ -74,9 +84,7 @@ bool showMenu() {
 
         response = responseChar - '0'; // convert the char value into a integer value
 
-        // clean input
-        std::cin.clear();
-        std::cin.ignore(MAX_CHARS, '\n');
+        clearInput();
 
         // Sanitize response, i.e., if response is not one of the options, inform the player.
 
@@ -146,11 +154,16 @@ std::string pickMaze() {
         
         std::cout << "Write the number, from 1 to 99, of the maze you want to play.\nIf you wish to return to the previous menu enter 0 instead.\n" << std::endl; // flush this string immediately
         std::cout << "Maze number: ";
-        std::cin >> mazeNumber;
+        if (!(std::cin >> mazeNumber) || std::cin.peek() != '\n') { // there was an error getting maze number or the user did not input just a number
 
-        // clean input stream
-        std::cin.clear();
-        std::cin.ignore(MAX_CHARS, '\n');
+            clearInput();
+            clearScreen();
+            std::cout << "\nPlease input just a number.\n" << std::endl;
+            continue;
+
+        }
+
+        clearInput();
 
         clearScreen();
         if (!mazeNumber) return "RETURN"; // the user wishes to go back to the previous menu, return special string indicating so
@@ -224,7 +237,7 @@ void fillBoard(Board &board, const std::vector<std::string> &fileLines) {
                     
                     break;
                 }
-
+                
                 case 'H': { // player found
                     
                     Player pogPlayer;
@@ -233,9 +246,7 @@ void fillBoard(Board &board, const std::vector<std::string> &fileLines) {
                     board.player = pogPlayer;
 
                     break;
-
                 }
-
             }
 
             lineChars.push_back(c); // append character            
@@ -246,6 +257,115 @@ void fillBoard(Board &board, const std::vector<std::string> &fileLines) {
 
     board.aliveRobots = board.robots.size();
 }
+
+char getMovementInput(){
+    
+    static const std::vector<char> validMoves = {'q', 'w', 'e', 'd', 'c', 'x', 'z', 'a', 's'}; // define as 'static const' as to create it only once, and not modify it after creation.
+    
+    // TODO: better move validation
+    while (true) {
+        char movement;
+
+        std::cout << "What movement do you want to make: ";
+        std::cin >> movement;
+
+        clearInput();
+
+        char auxMov = tolower(movement);
+        
+        if (std::find(validMoves.begin(), validMoves.end(), auxMov) == validMoves.end()) { // the move that the user entered is not one of the valid moves
+            std::cout << "Not a valid move." << std::endl;
+            // TODO: figure out how to present this without deformatting the output
+        } else return auxMov;
+    }
+
+}
+
+bool isValidPlayerPosition(const Board& board, const Position& pos){
+    if (pos.x < 1 || pos.x > board.width - 2 || pos.y < 1 || pos.y > board.height - 2) return false;
+    if (board.gameBoard.at(pos.y).at(pos.x) != ' ') return false; 
+    return true;  
+}
+
+void movePlayer(Board &board) {
+    char move = getMovementInput();
+
+    auto prevPos = board.player.pos; // get the current position of the player
+
+    Position newPos;
+
+    switch (move){
+        case 'w': {
+            newPos = {prevPos.x, prevPos.y - 1};
+            break;
+        }
+
+        case 'e': {
+            newPos = {prevPos.x + 1, prevPos.y - 1};
+            break;
+        }
+
+        case 'd': {
+            newPos = {prevPos.x + 1, prevPos.y};
+            break;
+        }
+
+        case 'c': {
+            newPos = {prevPos.x + 1, prevPos.y + 1};
+            break;
+        }
+
+        case 'x': {
+            newPos = {prevPos.x, prevPos.y + 1};
+            break;
+        }
+
+        case 'z':{
+            newPos = {prevPos.x - 1, prevPos.y + 1};
+            break;
+        }
+
+        case 'a': {
+            newPos = {prevPos.x - 1, prevPos.y};   
+            break;
+        }
+
+        case 'q': {
+            newPos = {prevPos.x - 1, prevPos.y - 1};
+            break;
+        }
+
+        case 's': {
+            return; // we do not wish to move, we can simply return from the function call
+        }
+
+        // no need for a default case because we make sure that only valid moves are passed in to this function
+    }
+
+    if(!isValidPlayerPosition(board, newPos)) {
+        
+        clearScreen();
+        std::cout << "That is not a valid position to move into.\n" << std::endl;
+
+        return;
+    }
+
+    board.gameBoard.at(newPos.y).at(newPos.x) = 'H';
+    board.gameBoard.at(prevPos.y).at(prevPos.x) = ' ';
+    board.player.pos = newPos;
+    clearScreen();
+}
+
+void play(Board& board) {
+
+    while (board.player.alive && board.aliveRobots) {
+
+        printBoard(board);
+
+        movePlayer(board);
+    }
+}
+
 
 /**
  * @brief This is the entrypoint for the program itself, required by the compiler.
@@ -277,7 +397,7 @@ int main() {
 
         fillBoard(board, fileLines);
 
-        printBoard(board);
+        play(board);
 
     }
 

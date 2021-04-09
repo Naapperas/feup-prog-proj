@@ -24,6 +24,12 @@
 inline void clearScreen();
 
 /**
+ * @brief Clears the standard input stream
+ * 
+ */
+inline void clearInput();
+
+/**
  * @brief Shows the rules of the game.
  * 
  * @param out the stream to write the rules to
@@ -58,3 +64,10 @@ std::vector<std::string> readFileLines(std::string filename);
  * @return true if the file exists, false otherwise
  */
 bool fileExists(std::string filename);
+
+/**
+ * @brief Plays the game using the specified board.
+ * 
+ * @param board the board to play the game on
+ */
+void play(Board& board);
