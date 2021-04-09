@@ -73,8 +73,9 @@ struct Board {
     std::vector<Robot> robots;
     unsigned int aliveRobots = 0;
 
-    std::vector<Position> eletricObstacles;
+    std::vector<Position> nonEletricObstacles;
 
+    // the player of the game
     Player player;
 
 };
@@ -92,3 +93,10 @@ void printBoard(const Board& board);
  * @return std::string the name of the maze file to read
  */
 std::string pickMaze();
+
+/**
+ * @brief fills the game board with the character read from the maze file.
+ * 
+ * @param board the board to full with charatchers
+ */
+void fillBoard(Board& board, const std::vector<std::string>& fileLines);

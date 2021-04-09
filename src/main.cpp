@@ -187,6 +187,66 @@ bool fileExists(std::string fileName) {
     return false; // default behavior
 }
 
+void fillBoard(Board &board, const std::vector<std::string> &fileLines) {
+    
+    std::string line = fileLines.at(0); // get first line, containing the maze size
+
+    std::stringstream ss(line);
+
+    char sep; // use this char as a separator because with the extraction operator, we can ignore an arbitrary amount of white spaces, so we don't need to worry about not correctly reading the dimensions of the board
+
+    // extract size info from the first line
+    ss >> board.height;
+    ss >> sep;
+    ss >> board.width;
+
+    board.gameBoard.reserve(board.height);
+
+    // use the parsed dimensions in order to not "over-read" characters
+    for (int i = 0; i < board.height; i++) {
+        
+        line = fileLines.at(i + 1);
+
+        std::vector<char> lineChars;
+        lineChars.reserve(board.width);
+
+        for (int j = 0; j < board.width; j++) {
+            
+            char c = line.at(j);
+
+            switch (c) {
+                case 'R': { // robot found
+
+                    Robot robotPog;
+                    
+                    robotPog.pos = {j, i};
+                    board.robots.push_back(robotPog);
+                    
+                    break;
+                }
+
+                case 'H': { // player found
+                    
+                    Player pogPlayer;
+
+                    pogPlayer.pos = {j, i};
+                    board.player = pogPlayer;
+
+                    break;
+
+                }
+
+            }
+
+            lineChars.push_back(c); // append character            
+        }
+
+        board.gameBoard.push_back(lineChars); // append the vector containing the lines characters
+    }
+
+    board.aliveRobots = board.robots.size();
+}
+
 /**
  * @brief This is the entrypoint for the program itself, required by the compiler.
  * 
@@ -214,6 +274,11 @@ int main() {
 
         // at this point it is garanteed that the file exists, so we can just read it;
         auto fileLines = readFileLines(mazeName);
+
+        fillBoard(board, fileLines);
+
+        printBoard(board);
+
     }
 
     waitForEnter();
