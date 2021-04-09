@@ -21,14 +21,14 @@
  * @brief Clears the screen so the console appears non-dirty.
  * 
  */
-void clearScreen();
+inline void clearScreen();
 
 /**
  * @brief Shows the rules of the game.
  * 
  * @param out the stream to write the rules to
  */
-void showRules();
+inline void showRules();
 
 /**
  * @brief Shows the game's menu.
@@ -41,7 +41,7 @@ bool showMenu();
  * @brief Waits for the enter key to be pressed.
  * 
  */
-void waitForEnter();
+inline void waitForEnter();
 
 /**
  * @brief Reads a file given by the specified filename and returns a vector containing every line in the file.
