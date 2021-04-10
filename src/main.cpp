@@ -30,6 +30,9 @@
 // the max number of chars that a stream can hold, used for clearing the standard input 
 #define MAX_CHARS std::numeric_limits <std::streamsize>::max()
 
+// convert a string to an integer
+#define str_to_int(i) std::stoi(i)
+
 // TODO: implement functionality first, refactor code later
 
 /**
@@ -45,7 +48,7 @@ inline bool operator==(const Position& pos1, const Position& pos2) {
 }
 
 inline void clearScreen() {
-    std::cout << std::string(500, '\n') << std::endl; // 500 should be a large enough number for the user not to scroll up
+    std::cout << std::string(10, '\n') << std::endl; // 500 should be a large enough number for the user not to scroll up
 }
 
 inline void clearInput() {
@@ -61,6 +64,12 @@ inline void showRules() {
     std::cout << "This is a robot maze game.\n\nYour goal is to escape all of the robots that exist in the labirinth.\nBut beaware: the fences and posts are electric, and you will get electrocuted if you touch them. So, you know... don't.\nEach time you make a move, the robots also move, and they will always move towards you in the direction of the shortest path.\nUse the:\n-AWDX keys to move vertically and horizontally.\n-QECZ keys to move diagonally.\n-S key to stay in place.\n\nIf you get captured by one of the robots or touch the fences/posts, you lose. If not, you win.\nRobots that collide with each other get destroyed/stuck, obstructing a cell that you can't move into.\nThat said, good luck.\n" << std::endl;
 }
 
+inline bool isNumber(const std::string& s) {
+    for (char c : s)
+        if (c < '0' || c > '9') return false;
+    return true;
+}
+
 bool showMenu() {
     
     // TODO: refactor this function to make it more expressive
@@ -71,18 +80,18 @@ bool showMenu() {
     
     while (true) {
 
-        char responseChar;
+        std::string responseStr;
 
         std::cout << '\n' << "1) Rules" << '\n' << "2) Play" << '\n' << "0) Exit" << "\n\n" << "Option: ";
-        std::cin >> responseChar; // even if the user inputs a multidigit number, we only look at the first character, because the input should only be one digit
+        std::cin >> responseStr; // even if the user inputs a multidigit number, we only look at the first character, because the input should only be one digit
 
-        if (responseChar < '0' || responseChar > '9') { // if input is not a digit
+        if (!isNumber(responseStr)) { // input is not a number
             clearScreen();
             std::cout << "\nPlease input a number.\n" << std::endl;
             continue;
         }
 
-        response = responseChar - '0'; // convert the char value into a integer value
+        response = str_to_int(responseStr);
 
         clearInput();
 
@@ -336,6 +345,7 @@ void movePlayer(Board &board) {
         }
 
         case 's': {
+            clearScreen();
             return; // we do not wish to move, we can simply return from the function call
         }
 
@@ -390,7 +400,7 @@ int main() {
         if (mazeName != "RETURN") break; // if 'pickMaze' returns "RETURN", we should iterate again through the menu.
     }
 
-    if (mazeName != "NO_MAZE") { // user might leave right away, test if the file name is the one that the variable was initialized with
+    if (mazeName != "NO_MAZE" && mazeName != "RETURN") { // user might leave right away, test if the file name is the one that the variable was initialized with
 
         // at this point it is garanteed that the file exists, so we can just read it;
         auto fileLines = readFileLines(mazeName);

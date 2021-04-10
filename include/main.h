@@ -24,6 +24,14 @@
 inline void clearScreen();
 
 /**
+ * @brief Checks if a given string represents a number or not.
+ * 
+ * @param s the string to check
+ * @return true if s represents a number, false otherwise
+ */
+inline bool isNumber(const std::string& s);
+
+/**
  * @brief Clears the standard input stream
  * 
  */
