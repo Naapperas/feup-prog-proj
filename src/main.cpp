@@ -48,7 +48,7 @@ inline bool operator==(const Position& pos1, const Position& pos2) {
 }
 
 inline void clearScreen() {
-    std::cout << std::string(10, '\n') << std::endl; // 500 should be a large enough number for the user not to scroll up
+    std::cout << std::string(500, '\n') << std::endl; // 500 should be a large enough number for the user not to scroll up
 }
 
 inline void clearInput() {
@@ -291,9 +291,10 @@ char getMovementInput(){
 }
 
 bool isValidPlayerPosition(const Board& board, const Position& pos){
-    if (pos.x < 1 || pos.x > board.width - 2 || pos.y < 1 || pos.y > board.height - 2) return false;
-    if (board.gameBoard.at(pos.y).at(pos.x) != ' ') return false; 
-    return true;  
+    // if (pos.x < 1 || pos.x > board.width - 2 || pos.y < 1 || pos.y > board.height - 2) return false; bounds are fences, so they can still kill us
+    if (board.gameBoard.at(pos.y).at(pos.x) == '*') 
+        return std::find(board.nonEletricObstacles.begin(), board.nonEletricObstacles.end(), pos) == board.nonEletricObstacles.end(); 
+    return true; // we are only prhibited frm moving into non-eletric fences/posts, so every ther move counts as valid
 }
 
 void movePlayer(Board &board) {
@@ -360,9 +361,21 @@ void movePlayer(Board &board) {
         return;
     }
 
-    board.gameBoard.at(newPos.y).at(newPos.x) = 'H';
-    board.gameBoard.at(prevPos.y).at(prevPos.x) = ' ';
-    board.player.pos = newPos;
+    char atPos = board.gameBoard.at(newPos.y).at(newPos.x);
+
+    if (atPos == ' ') { // we are moving into a blank position 
+
+        board.gameBoard.at(newPos.y).at(newPos.x) = 'H';
+        board.gameBoard.at(prevPos.y).at(prevPos.x) = ' ';
+        board.player.pos = newPos;
+    } else { // we got electrocuted/we got caught, player lost
+
+        board.gameBoard.at(newPos.y).at(newPos.x) = 'h';
+        board.gameBoard.at(prevPos.y).at(prevPos.x) = ' ';
+        board.player.alive = false;
+
+    }
+
     clearScreen();
 }
 
@@ -374,8 +387,17 @@ void play(Board& board) {
 
         movePlayer(board);
     }
-}
 
+    printBoard(board);
+
+    if (board.player.alive) { // all robots were destroyed, player wins
+
+    } else { // player lost, too bad
+
+        std::cout << "\nIt seems that you have lost, but don't worry, you can still try to beat the game next time.\n" << std::endl;
+
+    }
+}
 
 /**
  * @brief This is the entrypoint for the program itself, required by the compiler.
