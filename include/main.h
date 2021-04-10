@@ -74,6 +74,12 @@ std::vector<std::string> readFileLines(std::string filename);
 bool fileExists(std::string filename);
 
 /**
+ * @brief Exits the game and performs any cleanup necessary.
+ * 
+ */
+void makeExit();
+
+/**
  * @brief Plays the game using the specified board.
  * 
  * @param board the board to play the game on

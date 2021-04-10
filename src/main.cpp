@@ -269,7 +269,7 @@ void fillBoard(Board &board, const std::vector<std::string> &fileLines) {
     board.aliveRobots = board.robots.size();
 }
 
-char getMovementInput(){
+char getMovementInput() {
     
     static const std::vector<char> validMoves = {'q', 'w', 'e', 'd', 'c', 'x', 'z', 'a', 's'}; // define as 'static const' as to create it only once, and not modify it after creation.
     
@@ -280,6 +280,13 @@ char getMovementInput(){
 
         std::cout << "What movement do you want to make: ";
         std::cin >> movement;
+
+        if (std::cin.eof()) { // the user wants to quit the game gracefuly
+
+            std::cout << std::endl;
+
+            exit(0);
+        }
 
         clearInput();
 
@@ -404,12 +411,22 @@ void play(Board& board) {
     }
 }
 
+void makeExit() {
+
+    waitForEnter();
+
+    std::cout << "Until next time :-)" << std::endl;
+
+}
+
 /**
  * @brief This is the entrypoint for the program itself, required by the compiler.
  * 
  * @return int the exit code, default to 0;
  */
 int main() {
+
+    atexit(makeExit); // we want to gracefuly terminate the program if exit() is called, so register this method
 
     Board board;
 
@@ -438,9 +455,7 @@ int main() {
 
     }
 
-    waitForEnter();
-
-    std::cout << "Until next time :-)" << std::endl;
+    makeExit();
 
     return 0;
 }
