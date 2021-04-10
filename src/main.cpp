@@ -245,6 +245,8 @@ void fillBoard(Board &board, const std::vector<std::string> &fileLines) {
                     robotPog.pos = {j, i};
                     robotPog.alive = c == 'R'; // there can be dead robots at the start of the game serving just as obstacles
                     board.robots.push_back(robotPog);
+
+                    board.aliveRobots += c == 'R'; // if this is an alive robot, this expression evaluates to true, aka, 1
                     
                     break;
                 }
@@ -265,8 +267,6 @@ void fillBoard(Board &board, const std::vector<std::string> &fileLines) {
 
         board.gameBoard.push_back(lineChars); // append the vector containing the lines characters
     }
-
-    board.aliveRobots = board.robots.size();
 }
 
 char getMovementInput() {
