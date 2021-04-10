@@ -73,8 +73,6 @@ struct Board {
     std::vector<Robot> robots;
     unsigned int aliveRobots = 0;
 
-    std::vector<Position> nonEletricObstacles;
-
     // the player of the game
     Player player;
 

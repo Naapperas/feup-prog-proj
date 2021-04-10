@@ -237,11 +237,13 @@ void fillBoard(Board &board, const std::vector<std::string> &fileLines) {
             char c = line.at(j);
 
             switch (c) {
+                case 'r':
                 case 'R': { // robot found
 
                     Robot robotPog;
                     
                     robotPog.pos = {j, i};
+                    robotPog.alive = c == 'R'; // there can be dead robots at the start of the game serving just as obstacles
                     board.robots.push_back(robotPog);
                     
                     break;
@@ -272,6 +274,7 @@ char getMovementInput(){
     static const std::vector<char> validMoves = {'q', 'w', 'e', 'd', 'c', 'x', 'z', 'a', 's'}; // define as 'static const' as to create it only once, and not modify it after creation.
     
     // TODO: better move validation
+    // TODO: player might want to quit mid-game, implement so (using EOF)
     while (true) {
         char movement;
 
@@ -292,9 +295,11 @@ char getMovementInput(){
 
 bool isValidPlayerPosition(const Board& board, const Position& pos){
     // if (pos.x < 1 || pos.x > board.width - 2 || pos.y < 1 || pos.y > board.height - 2) return false; bounds are fences, so they can still kill us
-    if (board.gameBoard.at(pos.y).at(pos.x) == '*') 
-        return std::find(board.nonEletricObstacles.begin(), board.nonEletricObstacles.end(), pos) == board.nonEletricObstacles.end(); 
-    return true; // we are only prhibited frm moving into non-eletric fences/posts, so every ther move counts as valid
+    
+    switch (board.gameBoard.at(pos.y).at(pos.x)) {
+        case 'r': return false;
+        default: return true; // we are only prohibited from moving into dead robots, so every ther move counts as valid
+    }
 }
 
 void movePlayer(Board &board) {
