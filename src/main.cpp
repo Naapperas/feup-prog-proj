@@ -30,9 +30,6 @@
 // the max number of chars that a stream can hold, used for clearing the standard input 
 #define MAX_CHARS std::numeric_limits <std::streamsize>::max()
 
-// convert a string to an integer
-#define str_to_int(i) std::stoi(i)
-
 // TODO: implement functionality first, refactor code later
 
 /**
@@ -80,18 +77,14 @@ bool showMenu() {
     
     while (true) {
 
-        std::string responseStr;
-
         std::cout << '\n' << "1) Rules" << '\n' << "2) Play" << '\n' << "0) Exit" << "\n\n" << "Option: ";
-        std::cin >> responseStr; // even if the user inputs a multidigit number, we only look at the first character, because the input should only be one digit
 
-        if (!isNumber(responseStr)) { // input is not a number
+        if (!(std::cin >> response) || std::cin.peek() != '\n') { // input is not a number
+            clearInput();
             clearScreen();
             std::cout << "\nPlease input a number.\n" << std::endl;
             continue;
         }
-
-        response = str_to_int(responseStr);
 
         clearInput();
 
@@ -455,7 +448,7 @@ int main() {
 
     }
 
-    makeExit();
+    // makeExit(); this gets called after main returns, so we don't need to call it here
 
     return 0;
 }
