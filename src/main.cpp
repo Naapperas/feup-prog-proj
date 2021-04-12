@@ -455,7 +455,7 @@ void moveAllRobots(Board& board) {
                 robot.alive = false;
                 
                 for (auto &otherRobot : board.robots) {
-                    if (otherRobot.pos == prevPos) continue; // no checking ourselves twice
+                    if (otherRobot == robot) continue; // no checking ourselves twice
 
                     if (otherRobot.pos == nextPos) {
                         otherRobot.alive = false; // kill the other robot and stop checking for robots to kill
@@ -464,6 +464,8 @@ void moveAllRobots(Board& board) {
                 }
 
                 board.gameBoard.at(nextPos.y).at(nextPos.x) = 'r';
+
+                robot.pos = nextPos; // update robot position in case
 
                 board.aliveRobots -= 2;
 
