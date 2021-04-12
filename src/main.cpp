@@ -44,6 +44,16 @@ inline bool operator==(const Position& pos1, const Position& pos2) {
     return pos1.x == pos2.x && pos1.y == pos2.y;
 }
 
+inline bool operator==(const Robot& r1, const Robot& r2) {
+    return r1.id == r2.id;
+}
+
+int getRobotID() {
+    static int id = 1; // the starting robot id
+
+    return id++; 
+}
+
 inline void clearScreen() {
     std::cout << std::string(500, '\n') << std::endl; // 500 should be a large enough number for the user not to scroll up
 }
@@ -59,12 +69,6 @@ inline void showRules() {
     
     clearScreen();
     std::cout << "This is a robot maze game.\n\nYour goal is to escape all of the robots that exist in the labirinth.\nBut beaware: the fences and posts are electric, and you will get electrocuted if you touch them. So, you know... don't.\nEach time you make a move, the robots also move, and they will always move towards you in the direction of the shortest path.\nUse the:\n-AWDX keys to move vertically and horizontally.\n-QECZ keys to move diagonally.\n-S key to stay in place.\n\nIf you get captured by one of the robots or touch the fences/posts, you lose. If not, you win.\nRobots that collide with each other get destroyed/stuck, obstructing a cell that you can't move into.\nThat said, good luck.\n" << std::endl;
-}
-
-inline bool isNumber(const std::string& s) {
-    for (char c : s)
-        if (c < '0' || c > '9') return false;
-    return true;
 }
 
 bool showMenu() {
@@ -113,7 +117,7 @@ inline void waitForEnter() {
     if (std::cin.peek() =='\n') std::cin.ignore(MAX_CHARS, '\n');
 }
 
-std::vector<std::string> readFileLines(std::string filename) {
+std::vector<std::string> readFileLines(const std::string& filename) {
 
     std::vector<std::string> fileLines;
 
@@ -237,6 +241,7 @@ void fillBoard(Board &board, const std::vector<std::string> &fileLines) {
                     
                     robotPog.pos = {j, i};
                     robotPog.alive = c == 'R'; // there can be dead robots at the start of the game serving just as obstacles
+                    robotPog.id = getRobotID();
                     board.robots.push_back(robotPog);
 
                     board.aliveRobots += c == 'R'; // if this is an alive robot, this expression evaluates to true, aka, 1
@@ -297,12 +302,12 @@ bool isValidPlayerPosition(const Board& board, const Position& pos){
     // if (pos.x < 1 || pos.x > board.width - 2 || pos.y < 1 || pos.y > board.height - 2) return false; bounds are fences, so they can still kill us
     
     switch (board.gameBoard.at(pos.y).at(pos.x)) {
-        case 'r': return false;
+        case 'r': return false; // non-eletric fences
         default: return true; // we are only prohibited from moving into dead robots, so every ther move counts as valid
     }
 }
 
-void movePlayer(Board &board) {
+bool movePlayer(Board &board) {
     char move = getMovementInput();
 
     auto prevPos = board.player.pos; // get the current position of the player
@@ -352,7 +357,7 @@ void movePlayer(Board &board) {
 
         case 's': {
             clearScreen();
-            return; // we do not wish to move, we can simply return from the function call
+            return true; // we do not wish to move, we can simply return from the function call, return true to signal valid movement
         }
 
         // no need for a default case because we make sure that only valid moves are passed in to this function
@@ -363,7 +368,7 @@ void movePlayer(Board &board) {
         clearScreen();
         std::cout << "That is not a valid position to move into.\n" << std::endl;
 
-        return;
+        return false;
     }
 
     char atPos = board.gameBoard.at(newPos.y).at(newPos.x);
@@ -382,6 +387,8 @@ void movePlayer(Board &board) {
     }
 
     clearScreen();
+
+    return true;
 }
 
 void play(Board& board) {
@@ -390,17 +397,103 @@ void play(Board& board) {
 
         printBoard(board);
 
-        movePlayer(board);
+        bool playerMoved = movePlayer(board);
+        
+        if (playerMoved) moveAllRobots(board);
     }
 
     printBoard(board);
 
     if (board.player.alive) { // all robots were destroyed, player wins
+        
+        std::cout << "\nCongratulations, you won the game!\n" << std::endl;
 
     } else { // player lost, too bad
 
         std::cout << "\nIt seems that you have lost, but don't worry, you can still try to beat the game next time.\n" << std::endl;
 
+    }
+}
+
+Position getNextRobotMove(const Board& board, const Robot& robot) {
+    auto currPos = robot.pos;
+
+    int dx, dy; // the change of movement in the robots
+
+    dx = (currPos.x < board.player.pos.x) ? 1 : (currPos.x > board.player.pos.x) ? -1 : 0;
+    dy = (currPos.y < board.player.pos.y) ? 1 : (currPos.y > board.player.pos.y) ? -1 : 0;
+
+    return {currPos.x + dx, currPos.y + dy};
+}
+
+void moveRobot(Board& board, Robot& robot, const Position& newPos) {
+
+    auto prevPos = robot.pos;
+
+    board.gameBoard.at(newPos.y).at(newPos.x) = 'R';
+    robot.pos = newPos;
+
+}
+
+void moveAllRobots(Board& board) {
+
+    for (auto &robot : board.robots) {
+        if(!robot.alive) continue; // we do not want to move dead robots
+        
+        bool breakLoop = false;
+
+        Position prevPos = robot.pos;
+
+        Position nextPos = getNextRobotMove(board, robot);
+
+        board.gameBoard.at(prevPos.y).at(prevPos.x) = ' '; // when we move a robot, the last position is always vacant.
+
+        switch(board.gameBoard.at(nextPos.y).at(nextPos.x)) {
+
+            case 'R': // we got stuck on an alive robot, kill both
+                
+                robot.alive = false;
+                
+                for (auto &otherRobot : board.robots) {
+                    if (otherRobot.pos == prevPos) continue; // no checking ourselves twice
+
+                    if (otherRobot.pos == nextPos) {
+                        otherRobot.alive = false; // kill the other robot and stop checking for robots to kill
+                        break;
+                    }
+                }
+
+                board.gameBoard.at(nextPos.y).at(nextPos.x) = 'r';
+
+                board.aliveRobots -= 2;
+
+                break;
+
+            case 'r': // we got stuck on a dead robot, too bad
+            case '*': // we hit a fence
+                board.gameBoard.at(nextPos.y).at(nextPos.x) = 'r';
+
+                robot.alive = false;
+                
+                board.aliveRobots--;
+
+                break;
+
+            case 'H': // player lost
+                board.player.alive = false;
+                
+                board.gameBoard.at(nextPos.y).at(nextPos.x) = 'h';
+                
+                breakLoop = true;
+                break; // we can stop iterating through robots cause the player already died
+
+            default: //nothing extraordinary happens, just move the robot
+                moveRobot(board, robot, nextPos);
+                break;
+
+        };
+
+        if (breakLoop) break;
     }
 }
 

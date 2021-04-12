@@ -44,7 +44,18 @@ struct Robot {
     Position pos;
 
     bool alive = true;
+
+    int id;
 };
+
+/**
+ * @brief Checks if two robots are equal.
+ * 
+ * @param p1 the first robot
+ * @param p2 the second robot
+ * @return true if the given robots are the same, false otherwise
+ */
+inline bool operator==(const Robot& r1, const Robot& r2);
 
 /**
  * @brief The 'Player' entity.
@@ -79,6 +90,13 @@ struct Board {
 };
 
 /**
+ * @brief Returns the ID of a given robot.
+ * 
+ * @return int 
+ */
+int getRobotID();
+
+/**
  * @brief Prints the specified board to the screen.
  * 
  * @param board the board to print
@@ -110,8 +128,9 @@ char getMovementInput();
  * @brief Moves the player in the board.
  * 
  * @param board the board in which to move the player
+ * @return true if the player moved, false if the movement the user inputed was invalid
  */
-void movePlayer(Board &board);
+bool movePlayer(Board &board);
 
 /**
  * @brief Checks if the given position is valid for the player to move to
@@ -121,3 +140,27 @@ void movePlayer(Board &board);
  * @return true if the given position is valid , false otherwise
  */
 bool isValidPlayerPosition(const Board& board, const Position& pos);
+
+/**
+ * @brief Moves every robot in the game.
+ * 
+ */
+void moveAllRobots(Board& board);
+
+/**
+ * @brief Get the next movement of the given robot.
+ * 
+ * @param board the board where we are playing the game
+ * @param robot the robot to get the next movement of
+ * @return Position the position of the next movement of the given robot
+ */
+Position getNextRobotMove(const Board& board, const Robot& robot);
+
+/**
+ * @brief Mves the specified robot to the given position in the board.
+ * 
+ * @param board the board in which to move
+ * @param robot the robot to move
+ * @param position the position to move the robot into
+ */
+void moveRobot(Board& board, Robot& robot, const Position& newPos);

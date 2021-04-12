@@ -24,14 +24,6 @@
 inline void clearScreen();
 
 /**
- * @brief Checks if a given string represents a number or not.
- * 
- * @param s the string to check
- * @return true if s represents a number, false otherwise
- */
-inline bool isNumber(const std::string& s);
-
-/**
  * @brief Clears the standard input stream
  * 
  */
@@ -63,7 +55,7 @@ inline void waitForEnter();
  * @param filename the name of the file to read.
  * @return std::vector<std::string> a vector with the lines of the file, or an empty vector if the file does not exist/an error occurs
  */
-std::vector<std::string> readFileLines(std::string filename);
+std::vector<std::string> readFileLines(const std::string& filename);
 
 /**
  * @brief Checks if the given file exists or not.
