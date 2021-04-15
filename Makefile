@@ -20,7 +20,7 @@ OBJECTS := $(patsubst $(SRC)/%.cpp, $(OBJ)/%.o, $(SOURCES))
 # compiles every object into the final executable
 # $^ = the name of all dependencies of this recipe
 all: $(OBJECTS) makeBin
-	$(CC) $< -o $(BIN)/$(EXECUTABLE_NAME)
+	$(CC) -lm $< -o $(BIN)/$(EXECUTABLE_NAME)
 
 # compiles every source file into its respective object file
 # $@ = name of rule/recipe target

@@ -17,6 +17,8 @@
 
 #define MAX_PLAYER_NAME_LENGTH 15
 
+#define CHARS_PER_SCORE 4
+
 /**
  * @brief A node in the leaderboard, containing information about a player and its respective score.
  * 
@@ -77,3 +79,18 @@ void sortLeaderboard(Leaderboard& leaderboard);
  * @param newEntry the new entry to add
  */
 void addEntryToLeaderboard(Leaderboard& leaderboard, Node newEntry);
+
+/**
+ * @brief extract entries from the given file into the leaderboard if it exists, otherwise this method is a no-op.
+ * 
+ * @param filename the name of the file from which to extract the leaderbard entries
+ */
+void readLeaderboardFromFile(const std::string& fileName, Leaderboard& leaderboard);
+
+/**
+ * @brief Writes the specified leaderboard entry to the specified file
+ * 
+ * @param fileName the name of the file in which to store the leaderboard
+ * @param leaderboard the leaderboard object
+ */
+void writeLeaderboardToFile(const std::string& fileName, const Leaderboard& leaderboard);

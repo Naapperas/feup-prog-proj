@@ -19,6 +19,7 @@
 #include <chrono>
 #include <limits>
 #include <algorithm>
+#include <cmath>
 
 //PROJECT includes
 #include "../include/main.h"
@@ -122,16 +123,16 @@ bool showMenu() {
 
 inline void waitForEnter() {
     std::cout << "Press ENTER to continue..." << std::endl;
-    if (std::cin.peek() =='\n') std::cin.ignore(MAX_CHARS, '\n');
+    if (std::cin.peek() == '\n') std::cin.ignore(MAX_CHARS, '\n');
 }
 
-std::vector<std::string> readFileLines(const std::string& filename) {
+std::vector<std::string> readFileLines(const std::string& filename, const std::string& relativePath) {
 
     std::vector<std::string> fileLines;
 
     std::fstream f;
 
-    f.open(MAZE_PATH + filename, std::ios::in);
+    f.open(relativePath + filename, std::ios::in);
 
     if (f.is_open()) {
 
@@ -195,16 +196,16 @@ std::string pickMaze() {
 
         // check if file file exists
 
-        if(fileExists(mazeFileName)) return mazeFileName;
+        if(fileExists(mazeFileName, MAZE_PATH)) return mazeFileName;
 
         std::cout << "The given maze does not exist. Please choose another maze to play.\n" << std::endl;
 
     }
 }
 
-bool fileExists(std::string fileName) {
+bool fileExists(const std::string& fileName, const std::string& relativePath) {
 
-    std::ifstream file(MAZE_PATH + fileName);
+    std::ifstream file(relativePath + fileName);
 
     if (file.is_open()) {
         file.close();
@@ -220,7 +221,7 @@ void fillBoard(Board &board, const std::vector<std::string> &fileLines) {
 
     std::stringstream ss(line);
 
-    char sep; // use this char as a separator because with the extraction operator, we can ignore an arbitrary amount of white spaces, so we don't need to worry about not correctly reading the dimensions of the board
+    char sep; // use this char as a separator because with the extraction operator defined in std::stringstream, we can ignore an arbitrary amount of white spaces, so we don't need to worry about not correctly reading the dimensions of the board
 
     // extract size info from the first line
     ss >> board.height;
@@ -515,7 +516,7 @@ int getPlayerNameLength(const std::string& playerName) {
     int counter = 0;
 
     for (char c : playerName) {
-        if ((c & 0b11000000) == 0b10000000) continue; // utf-8 code points that have more than one byte always have a '10' as the most significant bits of the bytes ther than the first one, we can just skip them
+        if ((c & 0b11000000) == 0b10000000) continue; // utf-8 code points that have more than one byte always have a '10' as the most significant bits of the bytes other than the first one, we can just skip them
         counter++;
     }
 
@@ -529,7 +530,7 @@ std::string getPlayerName() {
 
         std::cout << "What is your name: ";
 
-        if(!getline(std::cin, name)) { // use getline instead of the extractin operator in order to get the whole line
+        if(!getline(std::cin, name)) { // use getline instead of the extraction operator in order to get the whole line
             clearInput();
             clearScreen();
             std::cout << "There was an error getting input from the user, please retype your name.\n" << std::endl;
@@ -538,8 +539,6 @@ std::string getPlayerName() {
 
         // we got no errors extracting player name, check if is within length
         int length = getPlayerNameLength(name);
-
-        std::cout << length << std::endl;
 
         if (length < 0 || length > MAX_PLAYER_NAME_LENGTH) {
             clearScreen();
@@ -561,6 +560,76 @@ void sortLeaderboard(Leaderboard& leaderboard) {
 
     std::sort(leaderboard.leaderboardEntries.begin(), leaderboard.leaderboardEntries.end(), [](const Node& a, const Node& b){return a < b;});
 
+}
+
+void readLeaderboardFromFile(const std::string& fileName, Leaderboard& leaderboard) {
+
+    if (!fileExists(fileName, LEADERBOARD_PATH)) return; 
+
+    auto fileLines = readFileLines(fileName, LEADERBOARD_PATH);
+
+    // the first 2 lines are header information, we can skip them
+    for (int i = 2; i < fileLines.size(); i++) {
+
+        auto line = fileLines.at(i);
+
+        // the last CHARS_PER_SCORE characters are the score
+
+        int score = 0;
+
+        // extract the score
+        for (int j = 0; j < CHARS_PER_SCORE; j++) {
+            char c = line.at(line.size() - CHARS_PER_SCORE + j);
+            score = score * 10 + ((c == ' ' ? '0' : c) - '0');
+        }
+
+        // the name that the user inputted might have more than 2 words, store each in tmp and work from there
+        std::string name, tmp;
+
+        std::stringstream ss(line);
+
+        ss >> tmp; // read first token
+
+        name += tmp;
+
+        ss.ignore(100, ' '); // try to clear as many blank spaces as possible, 100 is a reasonable ammount of space between name tokens
+
+        if (ss.peek() != '-') {
+            ss >> tmp;
+            name += (' ' + tmp);
+        }
+
+        addEntryToLeaderboard(leaderboard, {name, score});
+
+    }
+}
+
+void writeLeaderboardToFile(const std::string& fileName, const Leaderboard& leaderboard) {
+
+    std::ofstream file;
+
+    file.open(LEADERBOARD_PATH + fileName);
+
+    file << "Player";
+    file << std::string(16 - std::string("Player").length(), ' ');
+    file << "- Time";
+    file << '\n';
+
+    file << "----------------------" << '\n';
+
+    for (auto entry : leaderboard.leaderboardEntries) {
+        file << entry.playerName;
+        file << std::string(16 - getPlayerNameLength(entry.playerName), ' ');
+        file << "- ";
+
+        int numDigitsInScore = (entry.score <= 0) ? 0 : floor(log10(entry.score)) + 1;
+
+        file << std::string(CHARS_PER_SCORE - numDigitsInScore, ' '); // allign scores to the right
+        file << entry.score;
+        file << '\n';
+    }
+
+    file.close();
 }
 
 /**
@@ -592,7 +661,7 @@ int main() {
     if (mazeName != "NO_MAZE" && mazeName != "RETURN") { // user might leave right away, test if the file name is the one that the variable was initialized with
 
         // at this point it is garanteed that the file exists, so we can just read it;
-        auto fileLines = readFileLines(mazeName);
+        auto fileLines = readFileLines(mazeName, MAZE_PATH);
 
         fillBoard(board, fileLines);
 
@@ -608,11 +677,16 @@ int main() {
 
             std::string playerName = getPlayerName();
 
-            // TODO: read leaderboard file from mazeName, if it exists, if not, continue, because we oerwrite it anyway
+            // build the leaderboard file name from the maze file name already obtained earlier
+            std::string leaderboardFileName = std::string("MAZE_") + mazeName.at(5) + mazeName.at(6) + "_WINNERS.TXT";
+
+            readLeaderboardFromFile(leaderboardFileName, leaderboard);
 
             addEntryToLeaderboard(leaderboard, {playerName, score});
 
             sortLeaderboard(leaderboard);
+
+            writeLeaderboardToFile(leaderboardFileName, leaderboard);
 
         } else { // player lost, too bad
 
@@ -621,7 +695,6 @@ int main() {
             std::cout << "\nIt seems that you have lost, but don't worry, you can still try to beat the game next time.\n" << std::endl;
 
         }
-
     }
 
     // makeExit(); this gets called after main returns, so we don't need to call it here

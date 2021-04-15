@@ -53,17 +53,19 @@ inline void waitForEnter();
  * @brief Reads a file given by the specified filename and returns a vector containing every line in the file.
  * 
  * @param filename the name of the file to read.
+ * @param relativePath the relative path of the resource to read
  * @return std::vector<std::string> a vector with the lines of the file, or an empty vector if the file does not exist/an error occurs
  */
-std::vector<std::string> readFileLines(const std::string& filename);
+std::vector<std::string> readFileLines(const std::string& filename, const std::string& relativePath);
 
 /**
  * @brief Checks if the given file exists or not.
  * 
  * @param filename the name of the file to check
+ * @param relativePath the relative path to the file to the existance of
  * @return true if the file exists, false otherwise
  */
-bool fileExists(std::string filename);
+bool fileExists(const std::string& filename, const std::string& relativePath);
 
 /**
  * @brief Exits the game and performs any cleanup necessary.
