@@ -52,6 +52,10 @@ inline bool operator==(const Robot& r1, const Robot& r2) {
     return r1.id == r2.id;
 }
 
+inline bool operator<(const Node& lhs, const Node& rhs) {
+    return lhs.score < rhs.score;
+}
+
 int getRobotID() {
     static int id = 1; // the starting robot id
 
@@ -507,6 +511,48 @@ void makeExit() {
 
 }
 
+int getPlayerNameLength(const std::string& playerName) {
+    int counter = 0;
+
+    for (char c : playerName) {
+        if ((c & 0b11000000) == 0b10000000) continue; // utf-8 code points that have more than one byte always have a '10' as the most significant bits of the bytes ther than the first one, we can just skip them
+        counter++;
+    }
+
+    return counter;
+}
+
+std::string getPlayerName() {
+    std::string name;
+
+    while (true) {
+
+        std::cout << "What is your name: ";
+
+        if(!getline(std::cin, name)) { // use getline instead of the extractin operator in order to get the whole line
+            clearInput();
+            clearScreen();
+            std::cout << "There was an error getting input from the user, please retype your name.\n" << std::endl;
+            continue;
+        }
+
+        // we got no errors extracting player name, check if is within length
+        int length = getPlayerNameLength(name);
+
+        std::cout << length << std::endl;
+
+        if (length < 0 || length > MAX_PLAYER_NAME_LENGTH) {
+            clearScreen();
+            std::cout << "Name given is longer than the max amount of characters allowed (" << MAX_PLAYER_NAME_LENGTH << "), please retype your name.\n" << std::endl;
+            continue;
+        }
+
+        // name is within bounds, return it
+        return name;
+    }
+
+}
+
 /**
  * @brief This is the entrypoint for the program itself, required by the compiler.
  * 
@@ -541,13 +587,19 @@ int main() {
 
         auto score = play(board);
 
-        printBoard(board);
-
         if (board.player.alive) { // all robots were destroyed, player wins
             
+            clearScreen();
+
+            printBoard(board);
+
             std::cout << "\nCongratulations, you won the game!\n" << std::endl;
 
+            std::string playerName = getPlayerName();
+
         } else { // player lost, too bad
+
+            printBoard(board);
 
             std::cout << "\nIt seems that you have lost, but don't worry, you can still try to beat the game next time.\n" << std::endl;
 
