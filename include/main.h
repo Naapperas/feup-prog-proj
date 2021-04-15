@@ -75,5 +75,6 @@ void makeExit();
  * @brief Plays the game using the specified board.
  * 
  * @param board the board to play the game on
+ * @return the score of the game
  */
-void play(Board& board);
+int play(Board& board);

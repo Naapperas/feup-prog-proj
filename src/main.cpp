@@ -391,7 +391,9 @@ bool movePlayer(Board &board) {
     return true;
 }
 
-void play(Board& board) {
+int play(Board& board) {
+
+    auto startTime = std::chrono::high_resolution_clock::now();
 
     while (board.player.alive && board.aliveRobots) {
 
@@ -402,17 +404,11 @@ void play(Board& board) {
         if (playerMoved) moveAllRobots(board);
     }
 
-    printBoard(board);
+    auto endTime = std::chrono::high_resolution_clock::now();
 
-    if (board.player.alive) { // all robots were destroyed, player wins
-        
-        std::cout << "\nCongratulations, you won the game!\n" << std::endl;
+    auto score = std::chrono::duration_cast<std::chrono::seconds>(endTime - startTime).count();
 
-    } else { // player lost, too bad
-
-        std::cout << "\nIt seems that you have lost, but don't worry, you can still try to beat the game next time.\n" << std::endl;
-
-    }
+    return score;
 }
 
 Position getNextRobotMove(const Board& board, const Robot& robot) {
@@ -539,7 +535,19 @@ int main() {
 
         fillBoard(board, fileLines);
 
-        play(board);
+        auto score = play(board);
+
+        printBoard(board);
+
+        if (board.player.alive) { // all robots were destroyed, player wins
+            
+            std::cout << "\nCongratulations, you won the game!\n" << std::endl;
+
+        } else { // player lost, too bad
+
+            std::cout << "\nIt seems that you have lost, but don't worry, you can still try to beat the game next time.\n" << std::endl;
+
+        }
 
     }
 
