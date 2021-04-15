@@ -553,6 +553,16 @@ std::string getPlayerName() {
 
 }
 
+void addEntryToLeaderboard(Leaderboard& leaderboard, Node newEntry) {
+    leaderboard.leaderboardEntries.push_back(newEntry);
+}
+
+void sortLeaderboard(Leaderboard& leaderboard) {
+
+    std::sort(leaderboard.leaderboardEntries.begin(), leaderboard.leaderboardEntries.end(), [](const Node& a, const Node& b){return a < b;});
+
+}
+
 /**
  * @brief This is the entrypoint for the program itself, required by the compiler.
  * 
@@ -563,6 +573,7 @@ int main() {
     atexit(makeExit); // we want to gracefuly terminate the program if exit() is called, so register this method
 
     Board board;
+    Leaderboard leaderboard;
 
     clearScreen();
 
@@ -596,6 +607,12 @@ int main() {
             std::cout << "\nCongratulations, you won the game!\n" << std::endl;
 
             std::string playerName = getPlayerName();
+
+            // TODO: read leaderboard file from mazeName, if it exists, if not, continue, because we oerwrite it anyway
+
+            addEntryToLeaderboard(leaderboard, {playerName, score});
+
+            sortLeaderboard(leaderboard);
 
         } else { // player lost, too bad
 

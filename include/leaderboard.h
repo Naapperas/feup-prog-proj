@@ -13,6 +13,7 @@
 #pragma once
 
 #include <string>
+#include <vector>
 
 #define MAX_PLAYER_NAME_LENGTH 15
 
@@ -68,3 +69,11 @@ int getPlayerNameLength(const std::string& playerName);
  * @param leaderboard the leaderboard to sort
  */
 void sortLeaderboard(Leaderboard& leaderboard);
+
+/**
+ * @brief Adds the given entry to the leaderboard
+ * 
+ * @param leaderboard the leaderboard to edit
+ * @param newEntry the new entry to add
+ */
+void addEntryToLeaderboard(Leaderboard& leaderboard, Node newEntry);
