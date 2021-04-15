@@ -23,9 +23,13 @@
 //PROJECT includes
 #include "../include/main.h"
 #include "../include/game.h"
+#include "../include/leaderboard.h"
 
-// the relative path of the resources, to be changed when project is submitted
-#define PATH "./resources/"
+// the relative path of the mazes, to be changed when project is submitted
+#define MAZE_PATH "./resources/mazes/"
+
+// the relative path of the leaderboards, to be changed when project is submitted
+#define LEADERBOARD_PATH "./resources/leaderboards/"
 
 // the max number of chars that a stream can hold, used for clearing the standard input 
 #define MAX_CHARS std::numeric_limits <std::streamsize>::max()
@@ -123,7 +127,7 @@ std::vector<std::string> readFileLines(const std::string& filename) {
 
     std::fstream f;
 
-    f.open(PATH + filename, std::ios::in);
+    f.open(MAZE_PATH + filename, std::ios::in);
 
     if (f.is_open()) {
 
@@ -196,7 +200,7 @@ std::string pickMaze() {
 
 bool fileExists(std::string fileName) {
 
-    std::ifstream file(PATH + fileName);
+    std::ifstream file(MAZE_PATH + fileName);
 
     if (file.is_open()) {
         file.close();
