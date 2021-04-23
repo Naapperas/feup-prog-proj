@@ -35,8 +35,6 @@
 // the max number of chars that a stream can hold, used for clearing the standard input 
 #define MAX_CHARS std::numeric_limits <std::streamsize>::max()
 
-// TODO: implement functionality first, refactor code later
-
 /**
  * @brief Options avalaible when in the menu.
  * 
@@ -276,19 +274,18 @@ void fillBoard(Board &board, const std::vector<std::string> &fileLines) {
     }
 }
 
-char getMovementInput() {
+char getMovementInput(const Board &board) {
     
     static const std::vector<char> validMoves = {'q', 'w', 'e', 'd', 'c', 'x', 'z', 'a', 's'}; // define as 'static const' as to create it only once, and not modify it after creation.
     
     // TODO: better move validation
-    // TODO: player might want to quit mid-game, implement so (using EOF)
     while (true) {
         char movement;
 
         std::cout << "What movement do you want to make: ";
         std::cin >> movement;
 
-        if (std::cin.eof()) { // the user wants to quit the game gracefuly
+        if (std::cin.eof()) { // the user wants to quit the game gracefully
 
             std::cout << std::endl;
 
@@ -300,8 +297,9 @@ char getMovementInput() {
         char auxMov = tolower(movement);
         
         if (std::find(validMoves.begin(), validMoves.end(), auxMov) == validMoves.end()) { // the move that the user entered is not one of the valid moves
-            std::cout << "Not a valid move." << std::endl;
-            // TODO: figure out how to present this without deformatting the output
+            clearScreen();
+            std::cout << "Not a valid move.\n" << std::endl;
+            printBoard(board);
         } else return auxMov;
     }
 
@@ -317,7 +315,7 @@ bool isValidPlayerPosition(const Board& board, const Position& pos){
 }
 
 bool movePlayer(Board &board) {
-    char move = getMovementInput();
+    char move = getMovementInput(board);
 
     auto prevPos = board.player.pos; // get the current position of the player
 
