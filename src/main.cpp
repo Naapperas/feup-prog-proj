@@ -1,3 +1,4 @@
+// T10_G01
 /**
  * @file main.cpp
  * @author Nuno Pereira (up202007865@edu.fe.up.pt)
@@ -22,15 +23,15 @@
 #include <cmath>
 
 //PROJECT includes
-#include "../include/main.h"
-#include "../include/game.h"
-#include "../include/leaderboard.h"
+#include "./main.h"
+#include "./game.h"
+#include "./leaderboard.h"
 
 // the relative path of the mazes, to be changed when project is submitted
-#define MAZE_PATH "./resources/mazes/"
+#define MAZE_PATH "./"
 
 // the relative path of the leaderboards, to be changed when project is submitted
-#define LEADERBOARD_PATH "./resources/leaderboards/"
+#define LEADERBOARD_PATH "./"
 
 // the max number of chars that a stream can hold, used for clearing the standard input 
 #define MAX_CHARS std::numeric_limits <std::streamsize>::max()
@@ -80,8 +81,6 @@ inline void showRules() {
 
 bool showMenu() {
     
-    // TODO: refactor this function to make it more expressive
-
     int response;
 
     std::cout << "Robot Maze" << "\n\n" << "Menu:";
@@ -278,7 +277,6 @@ char getMovementInput(const Board &board) {
     
     static const std::vector<char> validMoves = {'q', 'w', 'e', 'd', 'c', 'x', 'z', 'a', 's'}; // define as 'static const' as to create it only once, and not modify it after creation.
     
-    // TODO: better move validation
     while (true) {
         char movement;
 
