@@ -7,3 +7,6 @@ PROGRAM DEVELOPMENT STATE:
 MAIN DIFFICULTIES:
  Trouble passing by reference, which led to unexpected copies of robots during movement;
  Trouble dealing with relative paths.
+
+COMPILATION:
+ To compile the source, simply type 'make' into the terminal in a system that supports make.
