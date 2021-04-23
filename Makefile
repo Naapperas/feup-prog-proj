@@ -17,15 +17,17 @@ CC := g++
 SOURCES := $(wildcard $(SRC)/*.cpp)
 OBJECTS := $(patsubst $(SRC)/%.cpp, $(OBJ)/%.o, $(SOURCES))
 
-# compiles every object into the final executable
+# compiles the executable and creates the directories if needed
+all: makeBin makeBuild $(BIN)/$(EXECUTABLE_NAME)
+
 # $^ = the name of all dependencies of this recipe
-all: $(OBJECTS) makeBin
-	$(CC) -lm $< -o $(BIN)/$(EXECUTABLE_NAME)
+$(BIN)/$(EXECUTABLE_NAME): $(OBJECTS)
+	$(CC) -lm $^ -o $@
 
 # compiles every source file into its respective object file
 # $@ = name of rule/recipe target
 # $< = name of first dependency of this recipe
-$(OBJ)/%.o: $(SRC)/%.cpp makeBuild
+$(OBJ)/%.o: $(SRC)/%.cpp
 	$(CC) -c $< -o $@
 
 # create the build folder if it doesn't already exist
