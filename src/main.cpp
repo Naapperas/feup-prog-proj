@@ -582,15 +582,16 @@ void readLeaderboardFromFile(const std::string& fileName, Leaderboard& leaderboa
         // the name that the user inputted might have more than 2 words, store each in tmp and work from there
         std::string name, tmp;
 
-        std::stringstream ss(line);
+        std::stringstream ss(line.substr(0, line.find_last_of('-'))); // substring to remove score part, and only get the name
 
         ss >> tmp; // read first token
 
         name += tmp;
 
-        ss.ignore(100, ' '); // try to clear as many blank spaces as possible, 100 is a reasonable ammount of space between name tokens
+        while (ss.peek() == ' ')
+            ss.ignore(1, ' '); // try to clear as many blank spaces as possible
 
-        if (ss.peek() != '-') {
+        if(ss.peek() != -1) {
             ss >> tmp;
             name += (' ' + tmp);
         }
