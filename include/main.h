@@ -15,9 +15,12 @@
 #pragma once
 
 #include <vector>
+#include <cmath>
 #include <string>
 
 #include "game.h"
+
+#define NUMBER_SIZE(num) (num <= 0) ? 0 : (floor(log10(num)) + 1)
 
 /**
  * @brief Clears the screen so the console appears non-dirty.

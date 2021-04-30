@@ -536,7 +536,11 @@ std::string getPlayerName() {
         // we got no errors extracting player name, check if is within length
         int length = getPlayerNameLength(name);
 
-        if (length < 0 || length > MAX_PLAYER_NAME_LENGTH) {
+        if(length == 0) {
+            clearScreen();
+            std::cout << "You have no name???????????\n" << std::endl;
+            continue;
+        } else if (length < 0 || length > MAX_PLAYER_NAME_LENGTH) {
             clearScreen();
             std::cout << "Name given is longer than the max amount of characters allowed (" << MAX_PLAYER_NAME_LENGTH << "), please retype your name.\n" << std::endl;
             continue;
@@ -576,7 +580,7 @@ void readLeaderboardFromFile(const std::string& fileName, Leaderboard& leaderboa
         // extract the score
         for (int j = 0; j < CHARS_PER_SCORE; j++) {
             char c = line.at(line.size() - CHARS_PER_SCORE + j);
-            score = score * 10 + ((c == ' ' ? '0' : c) - '0');
+            score = score * 10 + ((!isdigit(c) ? '0' : c) - '0');
         }
 
         // the name that the user inputted might have more than 2 words, store each in tmp and work from there
@@ -591,7 +595,7 @@ void readLeaderboardFromFile(const std::string& fileName, Leaderboard& leaderboa
         while (ss.peek() == ' ')
             ss.ignore(1, ' '); // try to clear as many blank spaces as possible
 
-        if(ss.peek() != -1) {
+        if(ss.peek() != EOF) { // end of the string stream
             ss >> tmp;
             name += (' ' + tmp);
         }
@@ -608,18 +612,20 @@ void writeLeaderboardToFile(const std::string& fileName, const Leaderboard& lead
     file.open(LEADERBOARD_PATH + fileName);
 
     file << "Player";
-    file << std::string(16 - std::string("Player").length(), ' ');
-    file << "- Time";
+    file << std::string(MAX_PLAYER_NAME_LENGTH - std::string("Player").length(), ' ');
+    file << " - ";
+    file << std::string(CHARS_PER_SCORE - std::string("Time").length(), ' ');
+    file << "Time";
     file << '\n';
 
-    file << "----------------------" << '\n';
+    file << std::string(MAX_PLAYER_NAME_LENGTH + 3 + CHARS_PER_SCORE, '-') << '\n';
 
     for (auto entry : leaderboard.leaderboardEntries) {
         file << entry.playerName;
-        file << std::string(16 - getPlayerNameLength(entry.playerName), ' ');
-        file << "- ";
+        file << std::string(MAX_PLAYER_NAME_LENGTH - getPlayerNameLength(entry.playerName), ' ');
+        file << " - ";
 
-        int numDigitsInScore = (entry.score <= 0) ? 0 : floor(log10(entry.score)) + 1;
+        int numDigitsInScore = NUMBER_SIZE(entry.score);
 
         file << std::string(CHARS_PER_SCORE - numDigitsInScore, ' '); // allign scores to the right
         file << entry.score;
@@ -663,6 +669,8 @@ int main() {
         fillBoard(board, fileLines);
 
         auto score = play(board);
+
+        if (NUMBER_SIZE(score) > CHARS_PER_SCORE) score = pow(10, CHARS_PER_SCORE) - 1; // clamp score to maximum score with length CHARS_PER_SCORE
 
         if (board.player.alive) { // all robots were destroyed, player wins
             
